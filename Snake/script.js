@@ -62,7 +62,7 @@ function moveSnake(snake) {
 
   if (!grow) {          // Wir bewegen uns alle 200ms (Z. 96) um einen Block in unserem Grid, 
     snake.body.pop();  //  in dem immer ein Kopf vorne hinzugefügt wird, und hinten wieder einer gelöscht wird
-  } else {            //   Alle 7 Sekunden (Z.101) wird ein "Kopf" hinzugefügt, welcher nicht gelöscht wird, und die Snake wächst.
+  } else {            //   Alle 5 Sekunden (Z.101) wird ein "Kopf" hinzugefügt, welcher nicht gelöscht wird, und die Snake wächst.
     grow = false;
   }
 }
