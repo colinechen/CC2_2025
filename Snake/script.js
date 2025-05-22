@@ -7,7 +7,7 @@ let gridSize = 15; // Größe der Blöcke, lässt sich anpassen, wenn mehr Spiel
 
 
 //WebSocket integrieren
-let roomName = 'snake-room';
+let roomName = 'snake-arena';
 let serverURL = 'wss://nosch.uber.space/web-rooms/';
 let socket = new WebSocket(serverURL);
 let clientId = null;
@@ -17,10 +17,12 @@ let clientId = null;
 let startX = Math.floor(Math.random() * (canvas.width / gridSize));
 let startY = Math.floor(Math.random() * (canvas.height / gridSize));
 
+
+
 // Spieler Eigenschaften, werden in der draw Funktion genutzt (Z.68-90)
 let player = {
   id: null, // wird später gesetzt, dient zur Unterscheidung der Spieler
-  body: [{ x: startX, y: startY }], // "Spawnt" Spieler an Random Position im Canvas
+  body: [{ x: startX, y: startY }], // "Spawnt" Spieler an random Position im Canvas
   direction: 'right', 
   color: getRandomColor(),
 };
@@ -100,6 +102,14 @@ setInterval(() => {
   sendMessage('*broadcast-message*', ['position', player]); //sendet an andere Spieler die Position
 }, 200); // alle 200 ms Bewegung
 
+// Andere Spieler lokal ebenfalls bewegen (Simulation der Bewegung)
+setInterval(() => {
+  for (let id in otherPlayers) {
+    moveSnake(otherPlayers[id]);
+  }
+},50);
+
+
 // Snake wächst alle 5 Sekunden
 setInterval(() => {
   grow = true;
@@ -135,12 +145,26 @@ socket.addEventListener('message', (event) => {
       draw();
       break;
 
-    case 'position':
-      const other = msg[1];
-      if (other.id !== clientId) {
-        otherPlayers[other.id] = other;
-      }
-      break;
+   case 'position':
+  const other = msg[1];
+  if (other.id !== clientId) {
+    if (!otherPlayers[other.id]) {
+      // Falls Spieler neu ist, initialisieren
+      otherPlayers[other.id] = other;
+    } else {
+      // Nur direction und Position updaten
+      otherPlayers[other.id].direction = other.direction;
+
+      // Option 1: Nur Kopfposition aktualisieren (nicht ganze body überschreiben)
+      // Optional: falls du dem Server mehr vertraust als der lokalen Simulation,
+      // dann kannst du auch entire body nehmen – das ist ein Design-Entscheid.
+
+      // Option 2 (besser sichtbar): Nehme nur body[0] vom Server und ergänze die Schlange lokal
+      otherPlayers[other.id].body[0] = other.body[0];
+    }
+  }
+  break;
+
 
     case '*client-exit*':
       const leftId = msg[1];
