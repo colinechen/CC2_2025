@@ -2,8 +2,8 @@ let canvas = document.getElementById('gameCanvas');
 let ctx = canvas.getContext('2d');
 let gridSize = 15; // Größe der Blöcke, lässt sich anpassen, wenn mehr Spieler drin sind
 
-// HARDCORE MODE: Gehe in Zeile 96 und 101, und Stelle die Intervalle auf 100ms und 1000ms ein, 
-// dann ist das Spiel schneller und die Snake wächst schneller
+// HARDCORE MODE: In Zeile 96 und 101, die Intervalle auf 100ms und 1000ms einstellen, 
+// dann ist das Spiel schneller und die Snakes wachsen schneller
 
 
 //WebSocket integrieren
