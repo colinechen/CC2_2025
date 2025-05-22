@@ -107,7 +107,7 @@ setInterval(() => {
   for (let id in otherPlayers) {
     moveSnake(otherPlayers[id]);
   }
-},50);
+},100);
 
 
 // Snake wächst alle 5 Sekunden
