@@ -25,6 +25,7 @@ let player = {
   body: [{ x: startX, y: startY }], // "Spawnt" Spieler an random Position im Canvas
   direction: 'right', 
   color: getRandomColor(),
+  active: true,
 };
 
 // Wenn true wächst die Snake, sonst nicht
@@ -39,8 +40,29 @@ document.addEventListener('keydown', (e) => { // Wenn Pfeiltaste nicht entgegeng
   if (e.key === 'ArrowRight' && player.direction !== 'left') player.direction = 'right';
 });
 
+function resetSnake(snake) {
+  if (snake.id === player.id) {
+    player.active = false;
+    player.body = []; // visuell entfernen
+
+    sendMessage('*broadcast-message*', ['position', player]);
+
+    document.getElementById("gameOverlay").style.display = "flex";
+
+
+    // Positioniere ihn mittig über dem Canvas
+    const rect = canvas.getBoundingClientRect();
+    playBtn.style.left = `${rect.left + rect.width / 2 - playBtn.offsetWidth / 2}px`;
+    playBtn.style.top = `${rect.top + rect.height / 2 - playBtn.offsetHeight / 2}px`;
+  } else {
+    delete otherPlayers[snake.id];
+  }
+}
+
+
 //Kopf kopieren, um zu bewegen
 function moveSnake(snake) {
+  if (!snake.active) return;
   let head = { ...snake.body[0] };
 
   // Bewegung in gewünschte Richtung, außer sie kommt aus der entgegengesetzten Richtung 
@@ -56,8 +78,29 @@ function moveSnake(snake) {
     head.x < 0 || head.x >= canvas.width / gridSize || //Wenn head X kleiner als 0 oder größer als Spielfeld ist, wird Bewegung blockiert
     head.y < 0 || head.y >= canvas.height / gridSize   //Wenn head y kleiner als 0 oder größer als Spielfeld ist, wird Bewegung blockiert
   ) {
+     resetSnake(snake);
     return; // blockiere Bewegung, wenn außerhalb   
   }         //GridSize ist der Faktor, durch den wir die Breite + Höhe des Canvas teilen, um die Anzahl der Blöcke zu erhalten
+
+  if (snake.body.some(segment => segment.x === head.x && segment.y === head.y)) {
+    console.log('Kollision mit sich selbst!');
+     resetSnake(snake);
+    return;
+  }
+
+  // 🧠 Kollision mit anderen Spielern (nur für eigenen Spieler prüfen!)
+  if (snake.id === player.id) {
+    for (let id in otherPlayers) {
+      let other = otherPlayers[id];
+      for (let segment of other.body) {
+        if (segment.x === head.x && segment.y === head.y) {
+          console.log('Kollision mit anderem Spieler!');
+           resetSnake(snake);
+          return;
+        }
+      }
+    }
+  }
 
   //Schlange wächst
   snake.body.unshift(head);
@@ -107,7 +150,7 @@ setInterval(() => {
   for (let id in otherPlayers) {
     moveSnake(otherPlayers[id]);
   }
-},100);
+},200);
 
 
 // Snake wächst alle 5 Sekunden
@@ -119,6 +162,22 @@ function getRandomColor() { // Gibt eine zufällige Farbe aus 5 Optionen aus. Sp
   let colors = ['#e63946', '#f1fa8c', '#06d6a0', '#118ab2', '#ff9f1c'];
   return colors[Math.floor(Math.random() * colors.length)];
 }
+
+document.getElementById("playBtn").addEventListener("click", () => {
+  if (!player.active) {
+    player.active = true;
+    player.body = [{
+      x: Math.floor(Math.random() * (canvas.width / gridSize)),
+      y: Math.floor(Math.random() * (canvas.height / gridSize))
+    }];
+    player.direction = 'right';
+    sendMessage('*broadcast-message*', ['position', player]);
+
+   document.getElementById("gameOverlay").style.display = "none";
+
+  }
+});
+
 
 //Nachricht an Server
 function sendMessage(...msg) {
