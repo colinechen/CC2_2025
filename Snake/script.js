@@ -88,7 +88,7 @@ function moveSnake(snake) {
     return;
   }
 
-  // 🧠 Kollision mit anderen Spielern (nur für eigenen Spieler prüfen!)
+  // Kollision mit anderen Spielern (nur für eigenen Spieler prüfen)
   if (snake.id === player.id) {
     for (let id in otherPlayers) {
       let other = otherPlayers[id];
@@ -215,8 +215,7 @@ socket.addEventListener('message', (event) => {
       otherPlayers[other.id].direction = other.direction;
 
       // Option 1: Nur Kopfposition aktualisieren (nicht ganze body überschreiben)
-      // Optional: falls du dem Server mehr vertraust als der lokalen Simulation,
-      // dann kannst du auch entire body nehmen – das ist ein Design-Entscheid.
+    
 
       // Option 2 (besser sichtbar): Nehme nur body[0] vom Server und ergänze die Schlange lokal
       otherPlayers[other.id].body[0] = other.body[0];

@@ -37,7 +37,7 @@ canvas {
   display: none; /* Nur bei Game Over anzeigen */
   justify-content: center;
   align-items: center;
-  z-index: 10; /* Liegt über dem Canvas */
+  z-index: 10; /*Liegt über dem Canvas */
 }
 
 #playBtn {
