@@ -41,8 +41,8 @@ document.addEventListener('keydown', (e) => { // Wenn Pfeiltaste nicht entgegeng
 });
 
 function resetSnake(snake) {
-  if (snake.id === player.id) {
-    player.active = false;
+  if (snake.id === player.id) { //oder hier 
+    player.active = false;  //Spezifische ID des getroffenen Spielers soll angesprochen werden, nur bei dieser Zeile
     player.body = []; // visuell entfernen
 
     sendMessage('*broadcast-message*', ['position', player]);
