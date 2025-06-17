@@ -123,9 +123,10 @@ function drawBlock(x, y, color) {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvas wird aktualisiert und aufgeräumt, um einen Ghost Effekt zu vermeiden
 
-  // eigene Snake zeichnen
-  for (let segment of player.body) {
-    drawBlock(segment.x, segment.y, player.color); // Jedes Segment wird als Block gezeichnet
+  if (player.active) {
+    for (let segment of player.body) {
+      drawBlock(segment.x, segment.y, player.color);
+    }
   }
 
   // andere Spieler zeichnen
@@ -176,7 +177,6 @@ document.getElementById("playBtn").addEventListener("click", () => {
     player.direction = 'right';
     sendMessage('*broadcast-message*', ['position', player]);
 
-    draw(); 
 
    document.getElementById("gameOverlay").style.display = "none";
 
@@ -242,6 +242,8 @@ socket.addEventListener('message', (event) => {
   
   
 });
+
+draw();
 
 
 
