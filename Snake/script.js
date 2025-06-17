@@ -176,6 +176,8 @@ document.getElementById("playBtn").addEventListener("click", () => {
     player.direction = 'right';
     sendMessage('*broadcast-message*', ['position', player]);
 
+    draw(); 
+
    document.getElementById("gameOverlay").style.display = "none";
 
   }
