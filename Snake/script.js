@@ -42,20 +42,21 @@ document.addEventListener('keydown', (e) => { // Wenn Pfeiltaste nicht entgegeng
 
 function resetSnake(snake) {
   if (snake.id === player.id) { //oder hier 
-    player.active = false;  //Spezifische ID des getroffenen Spielers soll angesprochen werden, nur bei dieser Zeile
+    player.active = false; //Spezifische ID des getroffenen Spielers soll angesprochen werden, nur bei dieser Zeile
     player.body = []; // visuell entfernen
+    
 
     sendMessage('*broadcast-message*', ['position', player]);
 
     document.getElementById("gameOverlay").style.display = "flex";
 
 
-    // Positioniere ihn mittig über dem Canvas
-    const rect = canvas.getBoundingClientRect();
+    // Positioniere Game-Overlay und Button zentral über Canvas
+    let rect = canvas.getBoundingClientRect();
     playBtn.style.left = `${rect.left + rect.width / 2 - playBtn.offsetWidth / 2}px`;
     playBtn.style.top = `${rect.top + rect.height / 2 - playBtn.offsetHeight / 2}px`;
   } else {
-    delete otherPlayers[snake.id];
+    delete otherPlayers[snake.id]; // entfernt andere Spieler wenn tot
   }
 }
 
@@ -105,9 +106,9 @@ function moveSnake(snake) {
   //Schlange wächst
   snake.body.unshift(head);
 
-  if (!grow) {          // Wir bewegen uns alle 200ms (Z. 96) um einen Block in unserem Grid, 
+  if (!grow) {          // Wir bewegen uns alle 200ms (Z. 147) um einen Block in unserem Grid, 
     snake.body.pop();  //  in dem immer ein Kopf vorne hinzugefügt wird, und hinten wieder einer gelöscht wird
-  } else {            //   Alle 5 Sekunden (Z.101) wird ein "Kopf" hinzugefügt, welcher nicht gelöscht wird, und die Snake wächst.
+  } else {            //   Alle 5 Sekunden (Z. 160) wird ein "Kopf" hinzugefügt, welcher nicht gelöscht wird, und die Snake wächst.
     grow = false;
   }
 }
@@ -135,14 +136,16 @@ function draw() {
     }
   }
 
-  requestAnimationFrame(draw);
+  requestAnimationFrame(draw); //Frames werden nacheinander gemalt
 }
 
 
-// Snake automatisch bewegen
+// Snake automatisch bewegen.
 setInterval(() => {
-  moveSnake(player);
-  sendMessage('*broadcast-message*', ['position', player]); //sendet an andere Spieler die Position
+  if (player.active) {
+    moveSnake(player);
+    sendMessage('*broadcast-message*', ['position', player]); // sendet Pos an andere Spieler FALLS Spieler aktiv ist
+  }
 }, 200); // alle 200 ms Bewegung
 
 // Andere Spieler lokal ebenfalls bewegen (Simulation der Bewegung)
@@ -193,8 +196,8 @@ socket.addEventListener('open', () => {
 
 socket.addEventListener('message', (event) => {
   if (!event.data) return;
-  const msg = JSON.parse(event.data);
-  const type = msg[0];
+  let msg = JSON.parse(event.data);
+  let type = msg[0];
 
   switch (type) {
     case '*client-id*':
@@ -205,7 +208,7 @@ socket.addEventListener('message', (event) => {
       break;
 
    case 'position':
-  const other = msg[1];
+  let other = msg[1];
   if (other.id !== clientId) {
     if (!otherPlayers[other.id]) {
       // Falls Spieler neu ist, initialisieren
@@ -233,4 +236,10 @@ socket.addEventListener('message', (event) => {
       console.warn('Server error:', msg[1]);
       break;
   }
+
+  
+  
 });
+
+
+
