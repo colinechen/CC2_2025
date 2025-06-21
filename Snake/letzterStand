@@ -5,15 +5,19 @@ let gridSize = 15; // Größe der Blöcke, lässt sich anpassen, wenn mehr Spiel
 // HARDCORE MODE: In Zeile 96 und 101, die Intervalle auf 100ms und 1000ms einstellen, 
 // dann ist das Spiel schneller und die Snakes wachsen schneller
 
-// WebSocket integrieren
+
+//WebSocket integrieren
 let roomName = 'snake-arena';
 let serverURL = 'wss://nosch.uber.space/web-rooms/';
 let socket = new WebSocket(serverURL);
 let clientId = null;
 
-// Zufällige Startposition für die Snakes
+
+//Zufällige Startposition für die Snakes
 let startX = Math.floor(Math.random() * (canvas.width / gridSize));
 let startY = Math.floor(Math.random() * (canvas.height / gridSize));
+
+
 
 // Spieler Eigenschaften, werden in der draw Funktion genutzt (Z.68-90)
 let player = {
@@ -36,17 +40,16 @@ document.addEventListener('keydown', (e) => { // Wenn Pfeiltaste nicht entgegeng
   if (e.key === 'ArrowRight' && player.direction !== 'left') player.direction = 'right';
 });
 
-// Snake zurücksetzen
 function resetSnake(snake) {
-  if (snake.id === player.id) { // oder hier 
-    player.active = false; // Spezifische ID des getroffenen Spielers soll angesprochen werden, nur bei dieser Zeile
+  if (snake.id === player.id) { //oder hier 
+    player.active = false; //Spezifische ID des getroffenen Spielers soll angesprochen werden, nur bei dieser Zeile
     player.body = []; // visuell entfernen
+    
 
-    // Änderung: Sende explizit ID des gestorbenen Spielers
-    sendMessage('*broadcast-message*', ['player-died', player.id]);
     sendMessage('*broadcast-message*', ['position', player]);
 
     document.getElementById("gameOverlay").style.display = "flex";
+
 
     // Positioniere Game-Overlay und Button zentral über Canvas
     let rect = canvas.getBoundingClientRect();
@@ -57,7 +60,8 @@ function resetSnake(snake) {
   }
 }
 
-// Kopf kopieren, um zu bewegen
+
+//Kopf kopieren, um zu bewegen
 function moveSnake(snake) {
   if (!snake.active) return;
   let head = { ...snake.body[0] };
@@ -72,16 +76,16 @@ function moveSnake(snake) {
 
   // Spielfeldgrenzen prüfen
   if (
-    head.x < 0 || head.x >= canvas.width / gridSize || // Wenn head X kleiner als 0 oder größer als Spielfeld ist, wird Bewegung blockiert
-    head.y < 0 || head.y >= canvas.height / gridSize   // Wenn head y kleiner als 0 oder größer als Spielfeld ist, wird Bewegung blockiert
+    head.x < 0 || head.x >= canvas.width / gridSize || //Wenn head X kleiner als 0 oder größer als Spielfeld ist, wird Bewegung blockiert
+    head.y < 0 || head.y >= canvas.height / gridSize   //Wenn head y kleiner als 0 oder größer als Spielfeld ist, wird Bewegung blockiert
   ) {
-    resetSnake(snake);
+     resetSnake(snake);
     return; // blockiere Bewegung, wenn außerhalb   
-  }
+  }         //GridSize ist der Faktor, durch den wir die Breite + Höhe des Canvas teilen, um die Anzahl der Blöcke zu erhalten
 
   if (snake.body.some(segment => segment.x === head.x && segment.y === head.y)) {
     console.log('Kollision mit sich selbst!');
-    resetSnake(snake);
+     resetSnake(snake);
     return;
   }
 
@@ -92,14 +96,14 @@ function moveSnake(snake) {
       for (let segment of other.body) {
         if (segment.x === head.x && segment.y === head.y) {
           console.log('Kollision mit anderem Spieler!');
-          resetSnake(snake);
+           resetSnake(snake);
           return;
         }
       }
     }
   }
 
-  // Schlange wächst
+  //Schlange wächst
   snake.body.unshift(head);
 
   if (!grow) {          // Wir bewegen uns alle 200ms (Z. 147) um einen Block in unserem Grid, 
@@ -109,7 +113,8 @@ function moveSnake(snake) {
   }
 }
 
-// Quadrat zeichnen
+
+//Quadrat zeichnen
 function drawBlock(x, y, color) {
   ctx.fillStyle = color;
   ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2); // Quadratische Blöcke, Rechteckig sieht komisch aus bei rotation 
@@ -127,7 +132,6 @@ function draw() {
   // andere Spieler zeichnen
   for (let id in otherPlayers) {
     let p = otherPlayers[id]; // Spieler-Objekt abrufen
-    if (!p.active) continue; // Nur aktive Spieler zeichnen
     for (let segment of p.body) {
       drawBlock(segment.x, segment.y, p.color); //Jedes Segment der anderen Schlange zeichnen
     }
@@ -135,6 +139,7 @@ function draw() {
 
   requestAnimationFrame(draw); //Frames werden nacheinander gemalt
 }
+
 
 // Snake automatisch bewegen.
 setInterval(() => {
@@ -149,7 +154,8 @@ setInterval(() => {
   for (let id in otherPlayers) {
     moveSnake(otherPlayers[id]);
   }
-}, 200);
+},200);
+
 
 // Snake wächst alle 5 Sekunden
 setInterval(() => {
@@ -171,11 +177,14 @@ document.getElementById("playBtn").addEventListener("click", () => {
     player.direction = 'right';
     sendMessage('*broadcast-message*', ['position', player]);
 
-    document.getElementById("gameOverlay").style.display = "none";
+
+   document.getElementById("gameOverlay").style.display = "none";
+
   }
 });
 
-// Nachricht an Server
+
+//Nachricht an Server
 function sendMessage(...msg) {
   socket.send(JSON.stringify(msg));
 }
@@ -200,26 +209,25 @@ socket.addEventListener('message', (event) => {
       draw();
       break;
 
-    case 'position':
-      let other = msg[1];
-      if (other.id !== clientId) {
-        if (!otherPlayers[other.id]) {
-          otherPlayers[other.id] = other;
-        } else {
-          otherPlayers[other.id].direction = other.direction;
-          otherPlayers[other.id].active = other.active;
-          otherPlayers[other.id].body[0] = other.body[0];
-        }
-      }
-      break;
+   case 'position':
+  let other = msg[1];
+  if (other.id !== clientId) {
+    if (!otherPlayers[other.id]) {
+      // Falls Spieler neu ist, initialisieren
+      otherPlayers[other.id] = other;
+    } else {
+      // Nur direction und Position updaten
+      otherPlayers[other.id].direction = other.direction;
 
-    // Änderung: Spieler bei Tod ausblenden
-    case 'player-died':
-      let deadId = msg[1];
-      if (otherPlayers[deadId]) {
-        otherPlayers[deadId].active = false;
-      }
-      break;
+      // Option 1: Nur Kopfposition aktualisieren (nicht ganze body überschreiben)
+    
+
+      // Option 2 (besser sichtbar): Nehme nur body[0] vom Server und ergänze die Schlange lokal
+      otherPlayers[other.id].body[0] = other.body[0];
+    }
+  }
+  break;
+
 
     case '*client-exit*':
       const leftId = msg[1];
@@ -230,6 +238,9 @@ socket.addEventListener('message', (event) => {
       console.warn('Server error:', msg[1]);
       break;
   }
+
+  
+  
 });
 
 draw();
