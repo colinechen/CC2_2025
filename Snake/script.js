@@ -146,10 +146,12 @@ setInterval(() => {
 
 // Andere Spieler lokal ebenfalls bewegen (Simulation der Bewegung)
 setInterval(() => {
+  if (!player.active) return; // WICHTIG: Nur simulieren, wenn der lokale Spieler lebt
   for (let id in otherPlayers) {
     moveSnake(otherPlayers[id]);
   }
 }, 200);
+
 
 // Snake wächst alle 5 Sekunden
 setInterval(() => {
