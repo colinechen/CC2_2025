@@ -36,16 +36,18 @@ document.addEventListener('keydown', (e) => { // Wenn Pfeiltaste nicht entgegeng
   if (e.key === 'ArrowRight' && player.direction !== 'left') player.direction = 'right';
 });
 
-// Handy-Steuerung aktivieren
-document.querySelectorAll(".control-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    let dir = btn.getAttribute("data-dir");
-    if (dir === "up" && player.direction !== "down") player.direction = "up";
-    if (dir === "down" && player.direction !== "up") player.direction = "down";
-    if (dir === "left" && player.direction !== "right") player.direction = "left";
-    if (dir === "right" && player.direction !== "left") player.direction = "right";
+// Mobile-Steuerung
+document.querySelectorAll('.dir-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const dir = btn.getAttribute('data-dir');
+    // Gleiche Logik wie bei Tastatursteuerung
+    if (dir === 'up' && player.direction !== 'down') player.direction = 'up';
+    if (dir === 'down' && player.direction !== 'up') player.direction = 'down';
+    if (dir === 'left' && player.direction !== 'right') player.direction = 'left';
+    if (dir === 'right' && player.direction !== 'left') player.direction = 'right';
   });
 });
+
 
 
 // Snake zurücksetzen
