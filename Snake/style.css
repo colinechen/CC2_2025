@@ -57,26 +57,4 @@ canvas {
   margin-top: 20px;
 }
 
-#mobileControls button {
-  background-color: #333;
-  color: white;
-  font-size: 50px;
-  padding: 40px;
-  margin: 10px;
-  border: none;
-  border-radius: 10px;
-  min-width: 60px;
-}
-
-#mobileControls div {
-  display: flex;
-  justify-content: center;
-}
-
-@media (max-width: 768px) {
-  #mobileControls {
-    display: flex;
-  }
-}
-
 
