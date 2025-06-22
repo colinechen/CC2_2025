@@ -36,6 +36,18 @@ document.addEventListener('keydown', (e) => { // Wenn Pfeiltaste nicht entgegeng
   if (e.key === 'ArrowRight' && player.direction !== 'left') player.direction = 'right';
 });
 
+// Handy-Steuerung aktivieren
+document.querySelectorAll(".control-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    let dir = btn.getAttribute("data-dir");
+    if (dir === "up" && player.direction !== "down") player.direction = "up";
+    if (dir === "down" && player.direction !== "up") player.direction = "down";
+    if (dir === "left" && player.direction !== "right") player.direction = "left";
+    if (dir === "right" && player.direction !== "left") player.direction = "right";
+  });
+});
+
+
 // Snake zurücksetzen
 function resetSnake(snake) {
   if (snake.id === player.id) { // oder hier 
@@ -146,12 +158,10 @@ setInterval(() => {
 
 // Andere Spieler lokal ebenfalls bewegen (Simulation der Bewegung)
 setInterval(() => {
-  if (!player.active) return; // WICHTIG: Nur simulieren, wenn der lokale Spieler lebt
   for (let id in otherPlayers) {
     moveSnake(otherPlayers[id]);
   }
 }, 200);
-
 
 // Snake wächst alle 5 Sekunden
 setInterval(() => {
