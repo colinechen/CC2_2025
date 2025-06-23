@@ -234,3 +234,20 @@ socket.addEventListener('message', (event) => {
 });
 
 draw();
+
+
+// MOBILE BUTTON-STEUERUNG: identisch zur Tastatursteuerung
+document.getElementById('btn-up').addEventListener('click', () => {
+  if (player.direction !== 'down') player.direction = 'up';
+});
+document.getElementById('btn-down').addEventListener('click', () => {
+  if (player.direction !== 'up') player.direction = 'down';
+});
+document.getElementById('btn-left').addEventListener('click', () => {
+  if (player.direction !== 'right') player.direction = 'left';
+});
+document.getElementById('btn-right').addEventListener('click', () => {
+  if (player.direction !== 'left') player.direction = 'right';
+});
+
+

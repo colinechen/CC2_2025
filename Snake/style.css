@@ -57,4 +57,25 @@ canvas {
   margin-top: 20px;
 }
 
+#mobileControls {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.control-btn {
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  margin: 5px;
+  border-radius: 10px;
+  border: none;
+  background-color: #ddd;
+  box-shadow: 2px 2px 4px #aaa;
+}
+
+.control-btn:active {
+  background-color: #bbb;
+}
+
+
 
