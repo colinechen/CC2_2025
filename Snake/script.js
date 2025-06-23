@@ -1,6 +1,5 @@
 let canvas = document.getElementById('gameCanvas');
 let ctx = canvas.getContext('2d');
-let playBtn = document.getElementById("playBtn");
 let gridSize = 15; // Größe der Blöcke, lässt sich anpassen, wenn mehr Spieler drin sind
 
 // HARDCORE MODE: In Zeile 96 und 101, die Intervalle auf 100ms und 1000ms einstellen, 
@@ -37,6 +36,7 @@ document.addEventListener('keydown', (e) => { // Wenn Pfeiltaste nicht entgegeng
   if (e.key === 'ArrowRight' && player.direction !== 'left') player.direction = 'right';
 });
 
+
 // Snake zurücksetzen
 function resetSnake(snake) {
   if (snake.id === player.id) { // oder hier 
@@ -60,9 +60,8 @@ function resetSnake(snake) {
 
 // Kopf kopieren, um zu bewegen
 function moveSnake(snake) {
-  if (!snake || !snake.active || !snake.body || snake.body.length === 0) return;
+  if (!snake.active) return;
   let head = { ...snake.body[0] };
-
 
   // Bewegung in gewünschte Richtung, außer sie kommt aus der entgegengesetzten Richtung 
   switch (snake.direction) {
@@ -104,9 +103,9 @@ function moveSnake(snake) {
   // Schlange wächst
   snake.body.unshift(head);
 
-  if (!grow) {          
-    snake.body.pop();  
-  } else {            
+  if (!grow) {          // Wir bewegen uns alle 200ms (Z. 147) um einen Block in unserem Grid, 
+    snake.body.pop();  //  in dem immer ein Kopf vorne hinzugefügt wird, und hinten wieder einer gelöscht wird
+  } else {            //   Alle 5 Sekunden (Z. 160) wird ein "Kopf" hinzugefügt, welcher nicht gelöscht wird, und die Snake wächst.
     grow = false;
   }
 }
@@ -114,11 +113,11 @@ function moveSnake(snake) {
 // Quadrat zeichnen
 function drawBlock(x, y, color) {
   ctx.fillStyle = color;
-  ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2);
+  ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2); // Quadratische Blöcke, Rechteckig sieht komisch aus bei rotation 
 }
 
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvas wird aktualisiert und aufgeräumt, um einen Ghost Effekt zu vermeiden
 
   if (player.active) {
     for (let segment of player.body) {
@@ -126,21 +125,39 @@ function draw() {
     }
   }
 
+  // andere Spieler zeichnen
   for (let id in otherPlayers) {
-    let p = otherPlayers[id];
-    if (!p.active) continue;
+    let p = otherPlayers[id]; // Spieler-Objekt abrufen
+    if (!p.active) continue; // Nur aktive Spieler zeichnen
     for (let segment of p.body) {
-      drawBlock(segment.x, segment.y, p.color);
+      drawBlock(segment.x, segment.y, p.color); //Jedes Segment der anderen Schlange zeichnen
     }
   }
 
-  requestAnimationFrame(draw);
+  requestAnimationFrame(draw); //Frames werden nacheinander gemalt
 }
 
-// INTERVALLE werden erst NACH WebSocket-Verbindung gestartet (weiter unten im socket.addEventListener)
+// Snake automatisch bewegen.
+setInterval(() => {
+  if (player.active) {
+    moveSnake(player);
+    sendMessage('*broadcast-message*', ['position', player]); // sendet Pos an andere Spieler FALLS Spieler aktiv ist
+  }
+}, 200); // alle 200 ms Bewegung
 
-// Zufallsfarbe
-function getRandomColor() {
+// Andere Spieler lokal ebenfalls bewegen (Simulation der Bewegung)
+setInterval(() => {
+  for (let id in otherPlayers) {
+    moveSnake(otherPlayers[id]);
+  }
+}, 200);
+
+// Snake wächst alle 5 Sekunden
+setInterval(() => {
+  grow = true;
+}, 5000);
+
+function getRandomColor() { // Gibt eine zufällige Farbe aus 5 Optionen aus. Spiel für 5 Spieler
   let colors = ['#e63946', '#f1fa8c', '#06d6a0', '#118ab2', '#ff9f1c'];
   return colors[Math.floor(Math.random() * colors.length)];
 }
@@ -159,39 +176,19 @@ document.getElementById("playBtn").addEventListener("click", () => {
   }
 });
 
-// Nachricht an Server
 function sendMessage(...msg) {
   if (socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(msg));
   } else {
-    console.warn("WebSocket ist noch nicht offen. Nachricht wird verworfen:", msg);
+    console.warn('WebSocket ist noch nicht verbunden. Nachricht nicht gesendet:', msg);
   }
 }
 
+
 socket.addEventListener('open', () => {
-  sendMessage('*enter-room*', roomName);
-  sendMessage('*subscribe-client-count*');
-  sendMessage('*subscribe-client-enter-exit*');
-
-  // Alle Intervall-Starts HIER, nach erfolgreicher Verbindung:
-
-  setInterval(() => {
-    if (player.active) {
-      moveSnake(player);
-      sendMessage('*broadcast-message*', ['position', player]);
-    }
-  }, 200);
-
-  setInterval(() => {
-    for (let id in otherPlayers) {
-      moveSnake(otherPlayers[id]);
-    }
-  }, 200);
-
-  setInterval(() => {
-    grow = true;
-  }, 5000);
-
+  sendMessage('*enter-room*', roomName); // Raum betreten
+  sendMessage('*subscribe-client-count*'); //Spieleranzahl abonnieren
+  sendMessage('*subscribe-client-enter-exit*'); // Beitritte/Verlassen abonnieren
   setInterval(() => socket.send(''), 30000); // Verbindung halten
 });
 
@@ -221,6 +218,7 @@ socket.addEventListener('message', (event) => {
       }
       break;
 
+    // Änderung: Spieler bei Tod ausblenden
     case 'player-died':
       let deadId = msg[1];
       if (otherPlayers[deadId]) {
@@ -240,26 +238,3 @@ socket.addEventListener('message', (event) => {
 });
 
 draw();
-
-function isMobileDevice() {
-  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-}
-
-if (isMobileDevice()) {
-  document.getElementById("mobileControls").style.display = "flex";
-}
-
-document.getElementById('btn-up').addEventListener('click', () => {
-  if (player.direction !== 'down') player.direction = 'up';
-});
-document.getElementById('btn-down').addEventListener('click', () => {
-  if (player.direction !== 'up') player.direction = 'down';
-});
-document.getElementById('btn-left').addEventListener('click', () => {
-  if (player.direction !== 'right') player.direction = 'left';
-});
-document.getElementById('btn-right').addEventListener('click', () => {
-  if (player.direction !== 'left') player.direction = 'right';
-});
-
-
