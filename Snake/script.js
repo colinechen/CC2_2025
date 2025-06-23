@@ -60,8 +60,9 @@ function resetSnake(snake) {
 
 // Kopf kopieren, um zu bewegen
 function moveSnake(snake) {
-  if (!snake.active) return;
+  if (!snake || !snake.active || !snake.body || snake.body.length === 0) return;
   let head = { ...snake.body[0] };
+
 
   // Bewegung in gewünschte Richtung, außer sie kommt aus der entgegengesetzten Richtung 
   switch (snake.direction) {
