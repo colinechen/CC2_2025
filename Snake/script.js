@@ -1,5 +1,6 @@
 let canvas = document.getElementById('gameCanvas');
 let ctx = canvas.getContext('2d');
+let playBtn = document.getElementById("playBtn");
 let gridSize = 15; // Größe der Blöcke, lässt sich anpassen, wenn mehr Spieler drin sind
 
 // HARDCORE MODE: In Zeile 96 und 101, die Intervalle auf 100ms und 1000ms einstellen, 
