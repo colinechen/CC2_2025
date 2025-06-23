@@ -213,17 +213,18 @@ socket.addEventListener('message', (event) => {
       break;
 
     case 'position':
-      let other = msg[1];
-      if (other.id !== clientId) {
-        if (!otherPlayers[other.id]) {
-          otherPlayers[other.id] = other;
-        } else {
-          otherPlayers[other.id].direction = other.direction;
-          otherPlayers[other.id].active = other.active;
-          otherPlayers[other.id].body[0] = other.body[0];
-        }
-      }
-      break;
+  let other = msg[1];
+  if (other.id !== clientId) {
+    if (!otherPlayers[other.id]) {
+      otherPlayers[other.id] = other;
+    } else {
+      otherPlayers[other.id].direction = other.direction;
+      otherPlayers[other.id].active = other.active;
+      otherPlayers[other.id].body = other.body.slice(); // <- hier den gesamten Körper übernehmen
+    }
+  }
+  break;
+
 
     // Änderung: Spieler bei Tod ausblenden
     case 'player-died':
