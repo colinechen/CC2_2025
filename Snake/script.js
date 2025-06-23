@@ -60,7 +60,7 @@ function resetSnake(snake) {
 
 // Kopf kopieren, um zu bewegen
 function moveSnake(snake) {
-  if (!snake.active) return;
+  if (!snake.active || !snake.body[0]) return;  
   let head = { ...snake.body[0] };
 
   // Bewegung in gewünschte Richtung, außer sie kommt aus der entgegengesetzten Richtung 
@@ -137,25 +137,6 @@ function draw() {
   requestAnimationFrame(draw); //Frames werden nacheinander gemalt
 }
 
-// Snake automatisch bewegen.
-setInterval(() => {
-  if (player.active) {
-    moveSnake(player);
-    sendMessage('*broadcast-message*', ['position', player]); // sendet Pos an andere Spieler FALLS Spieler aktiv ist
-  }
-}, 200); // alle 200 ms Bewegung
-
-// Andere Spieler lokal ebenfalls bewegen (Simulation der Bewegung)
-setInterval(() => {
-  for (let id in otherPlayers) {
-    moveSnake(otherPlayers[id]);
-  }
-}, 200);
-
-// Snake wächst alle 5 Sekunden
-setInterval(() => {
-  grow = true;
-}, 5000);
 
 function getRandomColor() { // Gibt eine zufällige Farbe aus 5 Optionen aus. Spiel für 5 Spieler
   let colors = ['#e63946', '#f1fa8c', '#06d6a0', '#118ab2', '#ff9f1c'];
@@ -186,11 +167,37 @@ function sendMessage(...msg) {
 
 
 socket.addEventListener('open', () => {
-  sendMessage('*enter-room*', roomName); // Raum betreten
-  sendMessage('*subscribe-client-count*'); //Spieleranzahl abonnieren
-  sendMessage('*subscribe-client-enter-exit*'); // Beitritte/Verlassen abonnieren
-  setInterval(() => socket.send(''), 30000); // Verbindung halten
+  sendMessage('*enter-room*', roomName);
+  sendMessage('*subscribe-client-count*');
+  sendMessage('*subscribe-client-enter-exit*');
+
+  // Verbindung halten
+  setInterval(() => sendMessage(''), 30000);
+
+  // ✅ Jetzt hier starten – erst wenn Socket offen ist!
+  setInterval(() => {
+    if (player.active) {
+      moveSnake(player);
+      sendMessage('*broadcast-message*', ['position', player]);
+    }
+  }, 200);
+
+  // Andere Spieler bewegen
+  setInterval(() => {
+    for (let id in otherPlayers) {
+      moveSnake(otherPlayers[id]);
+    }
+  }, 200);
+
+  // Wachstum
+  setInterval(() => {
+    grow = true;
+  }, 5000);
+
+  // Erste Position senden
+  sendMessage('*broadcast-message*', ['position', player]);
 });
+
 
 socket.addEventListener('message', (event) => {
   if (!event.data) return;
