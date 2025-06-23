@@ -37,7 +37,7 @@ canvas {
   display: none; /* Nur bei Game Over anzeigen */
   justify-content: center;
   align-items: center;
-  z-index: 10; /*Liegt über dem Canvas */
+  z-index: 10; /* Liegt über dem Canvas */
 }
 
 #playBtn {
@@ -50,28 +50,56 @@ canvas {
   z-index: 11;
 }
 
+/* === MOBIL-STEUERUNG === */
+
 #mobileControls {
-  display: none;
+  display: none; /* Nur auf Mobile aktiv anzeigen */
   flex-direction: column;
   align-items: center;
   margin-top: 20px;
+  text-align: center;
 }
 
+/* Anordnung der Steuerung */
+.row {
+  display: flex;
+  justify-content: center;
+  margin: 5px 0;
+}
+
+.row-middle {
+  width: 100%;
+  justify-content: space-around;
+  max-width: 300px;
+}
+
+.spacer {
+  width: 60px; /* Abstand zwischen Pfeil links und rechts */
+}
+
+/* Steuerungs-Buttons */
 .control-btn {
   font-size: 2.5rem;
   width: 80px;
   height: 80px;
-  margin: 10px;
+  margin: 5px;
   border-radius: 12px;
   border: none;
   background-color: #ddd;
   box-shadow: 2px 2px 4px #aaa;
 }
 
-
 .control-btn:active {
   background-color: #bbb;
 }
+
+/* Sichtbar nur auf kleinen Bildschirmen */
+@media (max-width: 768px) {
+  #mobileControls {
+    display: flex;
+  }
+}
+
 
 
 
