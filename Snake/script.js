@@ -212,6 +212,7 @@ socket.addEventListener('message', (event) => {
       draw();
       break;
 
+
     case 'position':
   let other = msg[1];
   if (other.id !== clientId) {
