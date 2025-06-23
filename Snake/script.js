@@ -235,6 +235,17 @@ socket.addEventListener('message', (event) => {
 
 draw();
 
+// Prüfe ob auf Mobile-Gerät gespielt wird (einfache Geräteerkennung)
+function isMobileDevice() {
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+// Wenn Mobile-Gerät erkannt, zeige Steuerungsbuttons
+if (isMobileDevice()) {
+  document.getElementById("mobileControls").style.display = "flex";
+}
+
+
 
 // MOBILE BUTTON-STEUERUNG: identisch zur Tastatursteuerung
 document.getElementById('btn-up').addEventListener('click', () => {
