@@ -154,6 +154,9 @@ document.getElementById("playBtn").addEventListener("click", () => {
     sendMessage('*broadcast-message*', ['position', player]);
 
     document.getElementById("gameOverlay").style.display = "none";
+
+    document.getElementById("bgMusic").play();
+
   }
 });
 
