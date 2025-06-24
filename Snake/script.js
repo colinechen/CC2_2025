@@ -172,7 +172,7 @@ socket.addEventListener('open', () => {
   sendMessage('*subscribe-client-enter-exit*');
 
   // Verbindung halten
-  setInterval(() => sendMessage(''), 30000);
+  setInterval(() => sendMessage('ping'), 30000);
 
   // ✅ Jetzt hier starten – erst wenn Socket offen ist!
   setInterval(() => {
