@@ -249,4 +249,48 @@ socket.addEventListener('message', (event) => {
   }
 });
 
+
+// Beim Laden soll das Spiel noch nicht starten
+player.active = false;
+
+// Startbutton und Musik starten + Startscreen ausblenden
+let startScreen = document.getElementById('startScreen');
+let startBtn = document.getElementById('startBtn');
+let bgMusic = document.getElementById('bgMusic');
+
+startBtn.addEventListener('click', () => {
+  startScreen.style.display = 'none';  // Startscreen ausblenden
+  document.getElementById("gameOverlay").style.display = "none"; // Overlay ausblenden
+
+  player.active = true;                 // Spieler aktivieren
+  bgMusic.play().catch(e => console.log('Musik konnte nicht starten:', e));  // Musik starten
+
+  player.body = [{
+    x: Math.floor(Math.random() * (canvas.width / gridSize)),
+    y: Math.floor(Math.random() * (canvas.height / gridSize))
+  }];
+  player.direction = 'right';
+  sendMessage('*broadcast-message*', ['position', player]);
+});
+
+
+// Der Rest bleibt so wie bei dir:
+// Bereits bestehender playBtn Listener für "Erneut spielen"
+document.getElementById("playBtn").addEventListener("click", () => {
+  if (!player.active) {
+    player.active = true;
+    player.body = [{
+      x: Math.floor(Math.random() * (canvas.width / gridSize)),
+      y: Math.floor(Math.random() * (canvas.height / gridSize))
+    }];
+    player.direction = 'right';
+    sendMessage('*broadcast-message*', ['position', player]);
+
+    document.getElementById("gameOverlay").style.display = "none";
+
+    document.getElementById("bgMusic").play();
+  }
+});
+
+
 draw();
