@@ -19,11 +19,11 @@ body {
 h1 {
   margin-bottom: 20px;
   font-size: 2.5rem;
-  color: white;
+  color: #ff9f1c;
 }
 
 canvas {
-  border: 2px solid white;
+  border: 2px solid #ff9f1c;
   background-color: #222;
 }
 
@@ -43,9 +43,42 @@ canvas {
 #playBtn {
   padding: 10px 20px;
   font-size: 20px;
-  background-color: #ffffff;
+  background-color: #ff9f1c;
+  color: white;
   border: none;
   cursor: pointer;
   border-radius: 8px;
   z-index: 11;
+}
+
+#playBtn:hover {
+  background-color: #f8ba64;
+}
+
+#startScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+#startBtn {
+  font-size: 2rem;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  border: none;
+  background-color: #ff9f1c;
+  color: white;
+  border-radius: 10px;
+  transition: background-color 0.3s;
+}
+
+#startBtn:hover {
+  background-color: #f8ba64;
 }

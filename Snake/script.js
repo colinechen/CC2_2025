@@ -1,69 +1,57 @@
+// === Canvas Setup ===
 let canvas = document.getElementById('gameCanvas');
 let ctx = canvas.getContext('2d');
-let gridSize = 15; // Größe der Blöcke, lässt sich anpassen, wenn mehr Spieler drin sind
+let gridSize = 15; // Größe der Blöcke (anpassbar für mehr Spieler)
 
-// HARDCORE MODE: In Zeile 96 und 101, die Intervalle auf 100ms und 1000ms einstellen, 
-// dann ist das Spiel schneller und die Snakes wachsen schneller
+// === Spiel-UI Elemente ===
+let startScreen = document.getElementById('startScreen');
+let startBtn = document.getElementById('startBtn');
+let playBtn = document.getElementById('playBtn'); // "Erneut spielen" Button
+let bgMusic = document.getElementById('bgMusic');
 
-// WebSocket integrieren
+// === WebSocket Setup ===
 let roomName = 'snake-arena';
 let serverURL = 'wss://nosch.uber.space/web-rooms/';
 let socket = new WebSocket(serverURL);
 let clientId = null;
 
-// Zufällige Startposition für die Snakes
+// === Spieler und Spielzustand ===
+// Zufällige Startposition
 let startX = Math.floor(Math.random() * (canvas.width / gridSize));
 let startY = Math.floor(Math.random() * (canvas.height / gridSize));
 
-// Spieler Eigenschaften, werden in der draw Funktion genutzt (Z.68-90)
 let player = {
-  id: null, // wird später gesetzt, dient zur Unterscheidung der Spieler
-  body: [{ x: startX, y: startY }], // "Spawnt" Spieler an random Position im Canvas
-  direction: 'right', 
+  id: null,                // Wird durch Server gesetzt
+  body: [{ x: startX, y: startY }], // Startposition zufällig
+  direction: 'right',
   color: getRandomColor(),
   active: true,
 };
 
-// Wenn true wächst die Snake, sonst nicht
-let otherPlayers = {}; // Andere Spieler werden in einem Array gespeichert, damit sie gezeichnet werden können
-let grow = true;
+let otherPlayers = {}; // Andere Spieler
+let grow = true;       // Ob die Snake wachsen soll
 
-// Tasteneingaben -> Richtung ändern
-document.addEventListener('keydown', (e) => { // Wenn Pfeiltaste nicht entgegengesetzte Snake Richtung -> Player Direction wird aktualisiert
-  if (e.key === 'ArrowUp' && player.direction !== 'down') player.direction = 'up';
-  if (e.key === 'ArrowDown' && player.direction !== 'up') player.direction = 'down';
-  if (e.key === 'ArrowLeft' && player.direction !== 'right') player.direction = 'left';
-  if (e.key === 'ArrowRight' && player.direction !== 'left') player.direction = 'right';
-});
+// === Hilfsfunktionen ===
 
-
-// Snake zurücksetzen
-function resetSnake(snake) {
-  if (snake.id === player.id) { // oder hier 
-    player.active = false; // Spezifische ID des getroffenen Spielers soll angesprochen werden, nur bei dieser Zeile
-    player.body = []; // visuell entfernen
-
-    // Änderung: Sende explizit ID des gestorbenen Spielers
-    sendMessage('*broadcast-message*', ['player-died', player.id]);
-    sendMessage('*broadcast-message*', ['position', player]);
-
-    document.getElementById("gameOverlay").style.display = "flex";
-
-    // Positioniere Game-Overlay und Button zentral über Canvas
-    let rect = canvas.getBoundingClientRect();
-    playBtn.style.left = `${rect.left + rect.width / 2 - playBtn.offsetWidth / 2}px`;
-    playBtn.style.top = `${rect.top + rect.height / 2 - playBtn.offsetHeight / 2}px`;
-  } else {
-    delete otherPlayers[snake.id]; // entfernt andere Spieler wenn tot
-  }
+// Zufällige Farbe für Spieler-Snake (5 Farben)
+function getRandomColor() {
+  let colors = ['#39ff14', '#ff073a', '#00ffff', '#fffb00', '#bf00ff'];
+  return colors[Math.floor(Math.random() * colors.length)];
 }
 
-// Kopf kopieren, um zu bewegen
+
+// Zeichnet ein Quadrat am Raster (x,y) mit Farbe
+function drawBlock(x, y, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2);
+}
+
+// Schlange bewegen
 function moveSnake(snake) {
-  if (!snake.active || !snake.body[0]) return;  
+  if (!snake.active || !snake.body[0]) return;
+
   let head = { ...snake.body[0] };
 
-  // Bewegung in gewünschte Richtung, außer sie kommt aus der entgegengesetzten Richtung 
   switch (snake.direction) {
     case 'up': head.y -= 1; break;
     case 'down': head.y += 1; break;
@@ -73,20 +61,21 @@ function moveSnake(snake) {
 
   // Spielfeldgrenzen prüfen
   if (
-    head.x < 0 || head.x >= canvas.width / gridSize || // Wenn head X kleiner als 0 oder größer als Spielfeld ist, wird Bewegung blockiert
-    head.y < 0 || head.y >= canvas.height / gridSize   // Wenn head y kleiner als 0 oder größer als Spielfeld ist, wird Bewegung blockiert
+    head.x < 0 || head.x >= canvas.width / gridSize ||
+    head.y < 0 || head.y >= canvas.height / gridSize
   ) {
     resetSnake(snake);
-    return; // blockiere Bewegung, wenn außerhalb   
+    return;
   }
 
+  // Kollision mit sich selbst prüfen
   if (snake.body.some(segment => segment.x === head.x && segment.y === head.y)) {
     console.log('Kollision mit sich selbst!');
     resetSnake(snake);
     return;
   }
 
-  // Kollision mit anderen Spielern (nur für eigenen Spieler prüfen)
+  // Kollision mit anderen Spielern prüfen (nur eigener Spieler)
   if (snake.id === player.id) {
     for (let id in otherPlayers) {
       let other = otherPlayers[id];
@@ -100,24 +89,43 @@ function moveSnake(snake) {
     }
   }
 
-  // Schlange wächst
+  // Kopf hinzufügen
   snake.body.unshift(head);
 
-  if (!grow) {          // Wir bewegen uns alle 200ms (Z. 147) um einen Block in unserem Grid, 
-    snake.body.pop();  //  in dem immer ein Kopf vorne hinzugefügt wird, und hinten wieder einer gelöscht wird
-  } else {            //   Alle 5 Sekunden (Z. 160) wird ein "Kopf" hinzugefügt, welcher nicht gelöscht wird, und die Snake wächst.
+  // Wenn grow false, letztes Segment entfernen (Schlange bewegt sich ohne Wachstum)
+  if (!grow) {
+    snake.body.pop();
+  } else {
     grow = false;
   }
 }
 
-// Quadrat zeichnen
-function drawBlock(x, y, color) {
-  ctx.fillStyle = color;
-  ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2); // Quadratische Blöcke, Rechteckig sieht komisch aus bei rotation 
+// Schlange zurücksetzen (nach Tod)
+function resetSnake(snake) {
+  if (snake.id === player.id) {
+    player.active = false;
+    player.body = [];
+
+    // Tod melden
+    sendMessage('*broadcast-message*', ['player-died', player.id]);
+    sendMessage('*broadcast-message*', ['position', player]);
+
+    // Overlay zeigen und Button zentrieren
+    document.getElementById("gameOverlay").style.display = "flex";
+
+    let rect = canvas.getBoundingClientRect();
+    playBtn.style.left = `${rect.left + rect.width / 2 - playBtn.offsetWidth / 2}px`;
+    playBtn.style.top = `${rect.top + rect.height / 2 - playBtn.offsetHeight / 2}px`;
+
+  } else {
+    // Andere Spieler entfernen
+    delete otherPlayers[snake.id];
+  }
 }
 
+// Canvas zeichnen (eigene und andere Spieler)
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvas wird aktualisiert und aufgeräumt, um einen Ghost Effekt zu vermeiden
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (player.active) {
     for (let segment of player.body) {
@@ -125,41 +133,18 @@ function draw() {
     }
   }
 
-  // andere Spieler zeichnen
   for (let id in otherPlayers) {
-    let p = otherPlayers[id]; // Spieler-Objekt abrufen
-    if (!p.active) continue; // Nur aktive Spieler zeichnen
+    let p = otherPlayers[id];
+    if (!p.active) continue;
     for (let segment of p.body) {
-      drawBlock(segment.x, segment.y, p.color); //Jedes Segment der anderen Schlange zeichnen
+      drawBlock(segment.x, segment.y, p.color);
     }
   }
 
-  requestAnimationFrame(draw); //Frames werden nacheinander gemalt
+  requestAnimationFrame(draw);
 }
 
-
-function getRandomColor() { // Gibt eine zufällige Farbe aus 5 Optionen aus. Spiel für 5 Spieler
-  let colors = ['#e63946', '#f1fa8c', '#06d6a0', '#118ab2', '#ff9f1c'];
-  return colors[Math.floor(Math.random() * colors.length)];
-}
-
-document.getElementById("playBtn").addEventListener("click", () => {
-  if (!player.active) {
-    player.active = true;
-    player.body = [{
-      x: Math.floor(Math.random() * (canvas.width / gridSize)),
-      y: Math.floor(Math.random() * (canvas.height / gridSize))
-    }];
-    player.direction = 'right';
-    sendMessage('*broadcast-message*', ['position', player]);
-
-    document.getElementById("gameOverlay").style.display = "none";
-
-    document.getElementById("bgMusic").play();
-
-  }
-});
-
+// Nachrichten an WebSocket senden, wenn verbunden
 function sendMessage(...msg) {
   if (socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(msg));
@@ -168,16 +153,25 @@ function sendMessage(...msg) {
   }
 }
 
+// === Tastatureingaben ===
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowUp' && player.direction !== 'down') player.direction = 'up';
+  if (e.key === 'ArrowDown' && player.direction !== 'up') player.direction = 'down';
+  if (e.key === 'ArrowLeft' && player.direction !== 'right') player.direction = 'left';
+  if (e.key === 'ArrowRight' && player.direction !== 'left') player.direction = 'right';
+});
+
+// === WebSocket Ereignisse ===
 
 socket.addEventListener('open', () => {
   sendMessage('*enter-room*', roomName);
   sendMessage('*subscribe-client-count*');
   sendMessage('*subscribe-client-enter-exit*');
 
-  // Verbindung halten
+  // Ping zum Verbinden aufrechterhalten
   setInterval(() => sendMessage('*ping*'), 30000);
 
-  // ✅ Jetzt hier starten – erst wenn Socket offen ist!
+  // Eigene Snake bewegen und Position senden (alle 200ms)
   setInterval(() => {
     if (player.active) {
       moveSnake(player);
@@ -185,14 +179,14 @@ socket.addEventListener('open', () => {
     }
   }, 200);
 
-  // Andere Spieler bewegen
+  // Andere Snakes bewegen (alle 200ms)
   setInterval(() => {
     for (let id in otherPlayers) {
       moveSnake(otherPlayers[id]);
     }
   }, 200);
 
-  // Wachstum
+  // Wachstum alle 5 Sekunden
   setInterval(() => {
     grow = true;
   }, 5000);
@@ -200,7 +194,6 @@ socket.addEventListener('open', () => {
   // Erste Position senden
   sendMessage('*broadcast-message*', ['position', player]);
 });
-
 
 socket.addEventListener('message', (event) => {
   if (!event.data) return;
@@ -212,25 +205,22 @@ socket.addEventListener('message', (event) => {
       clientId = msg[1];
       player.id = clientId;
       sendMessage('*broadcast-message*', ['position', player]);
-      draw();
+      draw();  // Zeichnen starten
       break;
 
-
     case 'position':
-  let other = msg[1];
-  if (other.id !== clientId) {
-    if (!otherPlayers[other.id]) {
-      otherPlayers[other.id] = other;
-    } else {
-      otherPlayers[other.id].direction = other.direction;
-      otherPlayers[other.id].active = other.active;
-      otherPlayers[other.id].body = other.body.slice(); // <- hier den gesamten Körper übernehmen
-    }
-  }
-  break;
+      let other = msg[1];
+      if (other.id !== clientId) {
+        if (!otherPlayers[other.id]) {
+          otherPlayers[other.id] = other;
+        } else {
+          otherPlayers[other.id].direction = other.direction;
+          otherPlayers[other.id].active = other.active;
+          otherPlayers[other.id].body = other.body.slice();
+        }
+      }
+      break;
 
-
-    // Änderung: Spieler bei Tod ausblenden
     case 'player-died':
       let deadId = msg[1];
       if (otherPlayers[deadId]) {
@@ -249,21 +239,15 @@ socket.addEventListener('message', (event) => {
   }
 });
 
+// === Buttons ===
 
-// Beim Laden soll das Spiel noch nicht starten
-player.active = false;
-
-// Startbutton und Musik starten + Startscreen ausblenden
-let startScreen = document.getElementById('startScreen');
-let startBtn = document.getElementById('startBtn');
-let bgMusic = document.getElementById('bgMusic');
-
+// Startbutton: Spiel starten und Musik abspielen
 startBtn.addEventListener('click', () => {
-  startScreen.style.display = 'none';  // Startscreen ausblenden
-  document.getElementById("gameOverlay").style.display = "none"; // Overlay ausblenden
+  startScreen.style.display = 'none';
+  document.getElementById("gameOverlay").style.display = "none";
 
-  player.active = true;                 // Spieler aktivieren
-  bgMusic.play().catch(e => console.log('Musik konnte nicht starten:', e));  // Musik starten
+  player.active = true;
+  bgMusic.play().catch(e => console.log('Musik konnte nicht starten:', e));
 
   player.body = [{
     x: Math.floor(Math.random() * (canvas.width / gridSize)),
@@ -273,10 +257,8 @@ startBtn.addEventListener('click', () => {
   sendMessage('*broadcast-message*', ['position', player]);
 });
 
-
-// Der Rest bleibt so wie bei dir:
-// Bereits bestehender playBtn Listener für "Erneut spielen"
-document.getElementById("playBtn").addEventListener("click", () => {
+// "Erneut spielen"-Button: Spiel neu starten, wenn tot
+playBtn.addEventListener('click', () => {
   if (!player.active) {
     player.active = true;
     player.body = [{
@@ -287,10 +269,12 @@ document.getElementById("playBtn").addEventListener("click", () => {
     sendMessage('*broadcast-message*', ['position', player]);
 
     document.getElementById("gameOverlay").style.display = "none";
-
-    document.getElementById("bgMusic").play();
+    bgMusic.play();
   }
 });
 
+// Spiel soll beim Laden nicht starten
+player.active = false;
 
+// Starte den Zeichenloop
 draw();
