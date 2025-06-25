@@ -161,6 +161,24 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight' && player.direction !== 'left') player.direction = 'right';
 });
 
+// === Touch-Button-Steuerung für Handys ===
+document.getElementById('btn-up').addEventListener('click', () => {
+  if (player.direction !== 'down') player.direction = 'up';
+});
+
+document.getElementById('btn-down').addEventListener('click', () => {
+  if (player.direction !== 'up') player.direction = 'down';
+});
+
+document.getElementById('btn-left').addEventListener('click', () => {
+  if (player.direction !== 'right') player.direction = 'left';
+});
+
+document.getElementById('btn-right').addEventListener('click', () => {
+  if (player.direction !== 'left') player.direction = 'right';
+});
+
+
 // === WebSocket Ereignisse ===
 
 socket.addEventListener('open', () => {

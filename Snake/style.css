@@ -82,3 +82,42 @@ canvas {
 #startBtn:hover {
   background-color: #f8ba64;
 }
+
+.mobile-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.arrow-row {
+  display: flex;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+.mobile-controls button {
+  width: 120px;
+  height: 100px;
+  font-size: 3rem;
+  border: none;
+  border-radius: 10px;
+  background-color: #ff9f1c;
+  color: white;
+  cursor: pointer;
+}
+
+.mobile-controls button:active {
+  background-color: #f8ba64;
+}
+
+@media (max-width: 768px) {
+  .mobile-controls {
+    display: flex;
+  }
+
+  canvas {
+    width: 90vw;
+    height: 90vw;
+  }
+}
