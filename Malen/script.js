@@ -14,6 +14,47 @@ const palette = {
   5: 'brown',
 };
 
+// Sprachsteuerung aktivieren
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition) {
+  const recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.lang = 'de-DE';
+  recognition.interimResults = false;
+
+  const colorWords = {
+    rosa: "1",
+    blau: "2",
+    mint: "3",
+    gelb: "4",
+    braun: "5"
+  };
+
+  recognition.onresult = function(event) {
+    const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+    console.log("Gesagt:", transcript);
+
+    Object.keys(colorWords).forEach(colorName => {
+      if (transcript.includes(colorName)) {
+        const number = colorWords[colorName];
+        selectedNumber = number;
+        selectedColor = palette[number];
+        colorLabel.setAttribute("value", `Farbe: ${colorName.charAt(0).toUpperCase() + colorName.slice(1)} (per Sprache)`);
+        console.log("Farbe gesetzt:", selectedColor);
+      }
+    });
+  };
+
+  recognition.onerror = function(event) {
+    console.error("Speech error", event.error);
+  };
+
+  recognition.start();
+} else {
+  console.warn("Spracherkennung wird von diesem Browser nicht unterstützt.");
+}
+
+
 // Zufälliges Motiv auswählen
 const keys = Object.keys(motifs);
 const chosenKey = keys[Math.floor(Math.random() * keys.length)];
