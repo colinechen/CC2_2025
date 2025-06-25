@@ -84,7 +84,7 @@ background-color: #f8ba64;
 }
 
 .mobile-controls {
-display: flex;
+display: none;
 flex-direction: column;
 align-items: center;
 margin-top: 20px;
