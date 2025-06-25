@@ -1,6 +1,10 @@
 body {
   margin: 0;
-  background-color: #111;
+  background-image: url('cutesnakes.png');
+  background-size: 50% auto;         /* Bild füllt die gesamte Fläche */
+  background-position: center;    /* zentriert */
+  background-repeat: no-repeat;   /* nicht wiederholen */
+  /*background-color: #111; */
   display: flex;
   justify-content: center;
   align-items: center;
