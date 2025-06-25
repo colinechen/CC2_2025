@@ -43,7 +43,7 @@ function getRandomColor() {
 // Zeichnet ein Quadrat am Raster (x,y) mit Farbe
 function drawBlock(x, y, color) {
   ctx.fillStyle = color;
-  ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2);
+  ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2); //x und y Achse und Abstand zwischen Segmenten
 }
 
 // Schlange bewegen
