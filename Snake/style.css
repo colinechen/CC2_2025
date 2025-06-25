@@ -4,7 +4,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   flex-direction: column;
   color: white;
   font-family: Arial, sans-serif;
@@ -84,7 +84,7 @@ canvas {
 }
 
 .mobile-controls {
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   margin-top: 20px;
