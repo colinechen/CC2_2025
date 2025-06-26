@@ -25,7 +25,7 @@ if (SpeechRecognition) {
   const colorWords = {
     rosa: "1",
     blau: "2",
-    gruen: "3",
+    mint: "3",
     gelb: "4",
     braun: "5"
   };
