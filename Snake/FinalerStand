@@ -177,7 +177,7 @@ socket.addEventListener('open', () => {
   // Verbindung halten
   setInterval(() => sendMessage('*ping*'), 30000);
 
-  // ✅ Jetzt hier starten – erst wenn Socket offen ist!
+
   setInterval(() => {
     if (player.active) {
       moveSnake(player);
@@ -230,7 +230,7 @@ socket.addEventListener('message', (event) => {
   break;
 
 
-    // Änderung: Spieler bei Tod ausblenden
+   
     case 'player-died':
       let deadId = msg[1];
       if (otherPlayers[deadId]) {
@@ -274,7 +274,7 @@ startBtn.addEventListener('click', () => {
 });
 
 
-// Der Rest bleibt so wie bei dir:
+
 // Bereits bestehender playBtn Listener für "Erneut spielen"
 document.getElementById("playBtn").addEventListener("click", () => {
   if (!player.active) {
