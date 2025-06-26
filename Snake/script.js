@@ -33,14 +33,14 @@ let grow = true;       // Kontrolle, Ob die Snake wachsen soll
 
 
 
-// Zufällige Farbe für Spieler-Snake
+// Zufällige Farbe für Snake
 function getRandomColor() {
   let colors = ['#39ff14', '#ff073a', '#00ffff', '#fffb00', '#bf00ff', '#FF10F0', '#FFB300', '#A1FF0A', '#00FFEF'];
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
 
-// Zeichnet ein Quadrat am Raster (x,y) mit Farbe und Abstand (gridsize -2 für x + y)
+// Zeichnet Quadrat am Raster (x,y) mit Farbe/ Abstand (gridsize -2 für x + y)
 function drawBlock(x, y, color) {
   ctx.fillStyle = color;
   ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2); // gezeichnet auf x und y Achse und Abstand zwischen Segmenten
@@ -205,7 +205,7 @@ socket.addEventListener('open', () => { //WebSocket Verbindung offen
   }, 200);
 
 
-  // Andere Snakes bewegen und (alle 200ms)
+  // Andere Snakes bewegen und senden (alle 200ms)
   setInterval(() => {
     for (let id in otherPlayers) {
       moveSnake(otherPlayers[id]);
@@ -225,7 +225,7 @@ socket.addEventListener('open', () => { //WebSocket Verbindung offen
 //WebSocket Nachrichten 
 socket.addEventListener('message', (event) => {
   if (!event.data) return;
-  let msg = JSON.parse(event.data); //JSON wird umgewandelt
+  let msg = JSON.parse(event.data); //wird in JSON wird umgewandelt
   let type = msg[0]; //Welche Info enthält Message
 
   switch (type) {
@@ -233,7 +233,7 @@ socket.addEventListener('message', (event) => {
       clientId = msg[1]; //speichert clientId
       player.id = clientId; //verbindet Id mit Spielerobjekt
       sendMessage('*broadcast-message*', ['position', player]); //teilt Position mit anderen
-      draw();  // Zeichnen starten
+      draw(); 
       break;
 
       //Positionsdaten anderer Spieler
@@ -243,7 +243,7 @@ socket.addEventListener('message', (event) => {
         if (!otherPlayers[other.id]) {
           otherPlayers[other.id] = other; // neuer Spieler wird zu otherPlayers hinzugefügt
         } else {
-          otherPlayers[other.id].direction = other.direction; //wenn spieler bekannt, dann Daten aktualisiert
+          otherPlayers[other.id].direction = other.direction; //wenn spieler bekannt, dann Daten einfach aktualisiert
           otherPlayers[other.id].active = other.active;
           otherPlayers[other.id].body = other.body.slice();
         }
