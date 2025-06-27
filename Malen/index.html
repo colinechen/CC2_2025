@@ -42,7 +42,6 @@
     </style>
   </head>
 
-
   <body>
     <!-- Startbildschirm -->
     <div id="startScreen">
@@ -50,31 +49,36 @@
       <button id="startButton">Start</button>
     </div>
 
-
     <!-- VR-Szene -->
-    <a-scene >
+    <a-scene>
       <a-assets>
         <img id="floorTexture" src="Texture/wood-2045379_1280.jpg" crossorigin="anonymous" />
         <audio id="clickSound" src="Malen/sharp-pop-328170.mp3"></audio>
       </a-assets>
 
-    <!-- Raum -->
+      <!-- Raum -->
       <a-plane position="0 -6 -3" rotation="-90 0 0" width="60" height="80" src="#floorTexture" repeat="1 1" shadow></a-plane>
       <a-box position="0 2 -8" depth="0.1" height="4" width="12" color="#EDE8D0"></a-box>
       <a-box position="-6 2 -3" depth="12" height="4" width="0.1" color="#EDE8D0"></a-box>
       <a-box position="6 2 -3" depth="12" height="4" width="0.1" color="#EDE8D0"></a-box>
       <a-box position="0 4 -3" width="12" height="0.1" depth="12" color="#c4bfaa"></a-box>
-      
-      <!--Bild Wand-->
-      <a-box position="-3 2 -8" width="3" height="2" depth="0.05" color="#333"></a-box>
-      <a-image src="Malen/Cat1.jpeg" position="-3 2 -7.94" width="1.8" height="1.3"></a-image>
 
+      <!--Deko-->
+      <a-entity gltf-model="Models/Fiddle-leaf Plant.glb" position="-5 0 -7" scale="0.3 0.3 0.3" rotation="0 45 0"></a-entity>
+      <a-entity gltf-model="Models/Fiddle-leaf Plant.glb" position="5 0.1 -7" scale="-0.3 0.3 0.3" rotation="0 45 0"></a-entity>
+
+      <!--Bild Wand-->
+      <a-box position="-5.7 2 -4.7" width="2.5" height="2" depth="0.01" color="#333" rotation="0 90 0"></a-box>
+      <a-image src="Malen/Cat1.jpeg" position="-5.5 2 -4.5" width="1.8" height="1.3" rotation="0 90 0"></a-image>
+
+      <a-box position="5.7 2 -4.7" width="2.5" height="2" depth="0.01" color="#333" rotation="0 -90 0"></a-box>
+      <a-image src="Malen/kitten-2558459_1280.jpg" position="5.5 2 -4.5" width="1.8" height="1.3" rotation="0 -90 0"></a-image>
 
       <!-- Licht -->
       <a-entity light="type: ambient; color: #ccc"></a-entity>
       <a-entity light="type: directional; intensity: 0.6" position="0 4 1"></a-entity>
 
-      <!--  Kamera mit Gaze-Cursor -->
+      <!-- Kamera mit Gaze-Cursor -->
       <a-entity camera position="0 1.6 0" look-controls>
         <a-cursor
           fuse="true"
@@ -85,7 +89,7 @@
         ></a-cursor>
       </a-entity>
 
-      <!--  Farbpalette -->
+      <!-- Farbpalette -->
       <a-entity id="palette" position="0 2.5 -2">
         <a-plane class="colorChoice" color='#ffd1dc' data-color='#ffd1dc' data-number="1" data-name="Rosa" position="-1 0 0" width="0.3" height="0.3"></a-plane>
         <a-text value="1" position="-1 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
@@ -102,26 +106,30 @@
         <a-plane class="colorChoice" color='brown' data-color='brown' data-number="5" data-name="Braun" position="0.6 0 0" width="0.3" height="0.3"></a-plane>
         <a-text value="5" position="0.6 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
 
-         <a-plane class="colorChoice" color='black' data-color='black' data-number="5" data-name="Schwarz" position="1 0 0" width="0.3" height="0.3"></a-plane>
+         <a-plane class="colorChoice" color='black' data-color='black' data-number="6" data-name="Schwarz" position="1 0 0" width="0.3" height="0.3"></a-plane>
         <a-text value="6" position="1 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
       </a-entity>
 
-      <!--  Reset-Button -->
+      <!-- Reset-Button -->
       <a-plane id="resetButton" position="1.5 2.5 -2" width="0.6" height="0.3" color="#ccc" class="clickable">
         <a-text value="Reset" align="center" color="black" position="0 0 0.01" width="2"></a-text>
       </a-plane>
 
-      <!--  Audio -->
+      <!-- Neuer Button "Neues Motiv" -->
+<a-plane id="newMotifButton" position="2.5 2.5 -2" width="1" height="0.3" color="#8ecae6" class="clickable">
+  <a-text value="Neues Motiv" align="center" color="black" position="0 0 0.01" width="3"></a-text>
+</a-plane>
+
+  
+      <!-- Audio -->
       <a-assets>
         <audio id="clickSound" src="Malen/plop-sound-made-with-my-mouth-100690.mp3"></audio>
       </a-assets>
       <a-entity id="paintSound" sound="src: #clickSound; on: playSound"></a-entity>
 
-      <!--  Farbstatus -->
+      <!-- Farbstatus -->
       <a-text id="selectedColorLabel" value="Farbe: -" position="0 2.2 -2" align="center" color="black"></a-text>
 
     </a-scene>
   </body>
 </html>
-
-

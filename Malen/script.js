@@ -139,6 +139,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+      function loadNewMotif() {
+    // Alten Blockcontainer entfernen, falls vorhanden
+    const oldContainer = document.getElementById("blockContainer");
+    if (oldContainer) {
+      oldContainer.parentNode.removeChild(oldContainer);
+    }
+    // Neues Motiv laden
+    initBlocks();
+  }
+
+  // Eventlistener für den "Neues Motiv"-Button
+  document.getElementById("newMotifButton").addEventListener("click", () => {
+    loadNewMotif();
+
     // Reset-Button
     document.getElementById("resetButton").addEventListener("click", () => {
       document.querySelectorAll(".paintBlock").forEach(block => {
