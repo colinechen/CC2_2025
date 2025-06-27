@@ -8,6 +8,7 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="motifs.js"></script>
     <script defer src="script.js"></script>
+
     <style>
       #startScreen {
         position: absolute;
@@ -86,20 +87,23 @@
 
       <!--  Farbpalette -->
       <a-entity id="palette" position="0 2.5 -2">
-        <a-plane class="colorChoice" color='#ffd1dc' data-color='#ffd1dc' data-number="1" data-name="Rosa" position="-0.8 0 0" width="0.3" height="0.3"></a-plane>
-        <a-text value="1" position="-0.8 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
+        <a-plane class="colorChoice" color='#ffd1dc' data-color='#ffd1dc' data-number="1" data-name="Rosa" position="-1 0 0" width="0.3" height="0.3"></a-plane>
+        <a-text value="1" position="-1 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
 
-        <a-plane class="colorChoice" color='#a8dadc' data-color='#a8dadc' data-number="2" data-name="Blau" position="-0.4 0 0" width="0.3" height="0.3"></a-plane>
-        <a-text value="2" position="-0.4 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
+        <a-plane class="colorChoice" color='#a8dadc' data-color='#a8dadc' data-number="2" data-name="Blau" position="-0.6 0 0" width="0.3" height="0.3"></a-plane>
+        <a-text value="2" position="-0.6 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
 
-        <a-plane class="colorChoice" color='#c1e1c1' data-color='#c1e1c1' data-number="3" data-name="Mint" position="0 0 0" width="0.3" height="0.3"></a-plane>
-        <a-text value="3" position="0 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
+        <a-plane class="colorChoice" color='#c1e1c1' data-color='#c1e1c1' data-number="3" data-name="Mint" position="-0.2 0 0" width="0.3" height="0.3"></a-plane>
+        <a-text value="3" position="-0.2 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
 
-        <a-plane class="colorChoice" color='#fff3b0' data-color='#fff3b0' data-number="4" data-name="Gelb" position="0.4 0 0" width="0.3" height="0.3"></a-plane>
-        <a-text value="4" position="0.4 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
+        <a-plane class="colorChoice" color='#fff3b0' data-color='#fff3b0' data-number="4" data-name="Gelb" position="0.2 0 0" width="0.3" height="0.3"></a-plane>
+        <a-text value="4" position="0.2 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
 
-        <a-plane class="colorChoice" color='brown' data-color='brown' data-number="5" data-name="Braun" position="0.8 0 0" width="0.3" height="0.3"></a-plane>
-        <a-text value="5" position="0.8 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
+        <a-plane class="colorChoice" color='brown' data-color='brown' data-number="5" data-name="Braun" position="0.6 0 0" width="0.3" height="0.3"></a-plane>
+        <a-text value="5" position="0.6 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
+
+         <a-plane class="colorChoice" color='black' data-color='black' data-number="5" data-name="Schwarz" position="1 0 0" width="0.3" height="0.3"></a-plane>
+        <a-text value="6" position="1 0.4 0" color="#000" align="center" width="2" pointer-events="none"></a-text>
       </a-entity>
 
       <!--  Reset-Button -->

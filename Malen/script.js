@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     3: '#c1e1c1',
     4: '#fff3b0',
     5: 'brown',
+    6: 'black'
   };
 
   // Startbutton-Klick
@@ -40,9 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const colorWords = {
       rosa: "1",
       blau: "2",
-      grün: "3",
+      mint: "3",
       gelb: "4",
-      braun: "5"
+      braun: "5",
+      schwarz: "6"
     };
 
     recognition.onresult = function (event) {
