@@ -17,6 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
     6: 'black'
   };
 
+  // Funktion zum Laden eines neuen Motivs (blockContainer löschen + neu laden)
+  function loadNewMotif() {
+    const oldContainer = document.getElementById("blockContainer");
+    if (oldContainer) {
+      oldContainer.parentNode.removeChild(oldContainer);
+    }
+    initBlocks();
+  }
+
   // Startbutton-Klick
   startButton.addEventListener("click", () => {
     startScreen.style.display = "none";      // Startbildschirm ausblenden
@@ -24,6 +33,18 @@ document.addEventListener('DOMContentLoaded', () => {
     startSpeechRecognition();                // Spracherkennung starten
     initBlocks();                            // Blöcke laden
   });
+
+  // Eventlistener für "Neues Motiv" Button
+  const newMotifButton = document.getElementById("newMotifButton");
+  if (newMotifButton) {
+    newMotifButton.addEventListener("click", () => {
+      loadNewMotif();
+      // Farbwahl & Label zurücksetzen
+      selectedColor = null;
+      selectedNumber = null;
+      colorLabel.setAttribute("value", "Farbe: -");
+    });
+  }
 
   // Funktion: Spracherkennung starten
   function startSpeechRecognition() {
@@ -139,29 +160,5 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-      function loadNewMotif() {
-    // Alten Blockcontainer entfernen, falls vorhanden
-    const oldContainer = document.getElementById("blockContainer");
-    if (oldContainer) {
-      oldContainer.parentNode.removeChild(oldContainer);
-    }
-    // Neues Motiv laden
-    initBlocks();
-  }
-
-  // Eventlistener für den "Neues Motiv"-Button
-  document.getElementById("newMotifButton").addEventListener("click", () => {
-    loadNewMotif();
-
-    // Reset-Button
-    document.getElementById("resetButton").addEventListener("click", () => {
-      document.querySelectorAll(".paintBlock").forEach(block => {
-        block.setAttribute("color", "#ffffff");
-      });
-
-      selectedColor = null;
-      selectedNumber = null;
-      colorLabel.setAttribute("value", "Farbe: -");
-    });
   }
 });
