@@ -1,65 +1,74 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const startScreen = document.getElementById("startScreen");
-  const startButton = document.getElementById("startButton");
-  const scene = document.querySelector("a-scene");
+  // Warte, bis die HTML-Seite komplett geladen ist, bevor der Code startet
 
+  // Referenzen zu wichtigen Elementen holen
+  let startScreen = document.getElementById("startScreen");        // Startbildschirm-Div
+  let startButton = document.getElementById("startButton");        // Start-Button
+  let scene = document.querySelector("a-scene");                   // Die VR-Szene
+
+  // Variablen für aktuell ausgewählte Farbe und Block-Nummer (anfangs leer)
   let selectedColor = null;
   let selectedNumber = null;
-  const colorLabel = document.getElementById("selectedColorLabel");
-  const paintSound = document.getElementById("paintSound");
 
-  const palette = {
-    1: '#ffd1dc',
-    2: '#a8dadc',
-    3: '#c1e1c1',
-    4: '#fff3b0',
-    5: 'brown',
-    6: 'black'
+  // Anzeigeelement für die gewählte Farbe
+  let colorLabel = document.getElementById("selectedColorLabel");
+
+  // Audioelement für Malgeräusch
+  let paintSound = document.getElementById("paintSound");
+
+  // Farbpalette: Nummer → Farbcode
+  let palette = {
+    1: '#ffd1dc',    // Rosa
+    2: '#a8dadc',    // Blau
+    3: '#c1e1c1',    // Mint
+    4: '#fff3b0',    // Gelb
+    5: 'brown',      // Braun
+    6: 'black'       // Schwarz
   };
 
-  // Funktion zum Laden eines neuen Motivs (blockContainer löschen + neu laden)
+  // Funktion: Neues Motiv laden (vorheriges löschen + neue Blöcke erstellen)
   function loadNewMotif() {
-    const oldContainer = document.getElementById("blockContainer");
+    let oldContainer = document.getElementById("blockContainer");
     if (oldContainer) {
-      oldContainer.parentNode.removeChild(oldContainer);
+      oldContainer.parentNode.removeChild(oldContainer);  // Alten Block-Container entfernen
     }
-    initBlocks();
+    initBlocks();  // Neue Blöcke laden
   }
 
-  // Startbutton-Klick
+  // Klick-Event für den Start-Button
   startButton.addEventListener("click", () => {
-    startScreen.style.display = "none";      // Startbildschirm ausblenden
-    scene.style.display = "block";           // VR-Szene anzeigen
-    startSpeechRecognition();                // Spracherkennung starten
-    initBlocks();                            // Blöcke laden
+    startScreen.style.display = "none";   // Startbildschirm ausblenden
+    scene.style.display = "block";        // VR-Szene sichtbar machen
+    startSpeechRecognition();              // Spracherkennung starten
+    initBlocks();                         // Blöcke des Motivs anzeigen
   });
 
-  // Eventlistener für "Neues Motiv" Button
-  const newMotifButton = document.getElementById("newMotifButton");
+  // Eventlistener für den Button "Neues Motiv"
+  let newMotifButton = document.getElementById("newMotifButton");
   if (newMotifButton) {
     newMotifButton.addEventListener("click", () => {
-      loadNewMotif();
-      // Farbwahl & Label zurücksetzen
-      selectedColor = null;
+      loadNewMotif();                     // Neues Motiv laden
+      selectedColor = null;               // Farbwahl zurücksetzen
       selectedNumber = null;
-      colorLabel.setAttribute("value", "Farbe: -");
+      colorLabel.setAttribute("value", "Farbe: -");  // Anzeige zurücksetzen
     });
   }
 
-  // Funktion: Spracherkennung starten
+  // Funktion: Spracherkennung einrichten und starten
   function startSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       console.warn("Spracherkennung wird von diesem Browser nicht unterstützt.");
-      return;
+      return;  // Abbrechen, wenn keine Unterstützung vorhanden ist
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.lang = 'de-DE';
-    recognition.interimResults = false;
+    let recognition = new SpeechRecognition();
+    recognition.continuous = true;        // Dauerhaft zuhören
+    recognition.lang = 'de-DE';           // Sprache: Deutsch
+    recognition.interimResults = false;   // Nur fertige Ergebnisse liefern
 
-    const colorWords = {
+    // Wörter für Farben mit zugehörigen Nummern
+    let colorWords = {
       rosa: "1",
       blau: "2",
       mint: "3",
@@ -68,92 +77,102 @@ document.addEventListener('DOMContentLoaded', () => {
       schwarz: "6"
     };
 
+    // Wenn ein Sprachergebnis erkannt wird
     recognition.onresult = function (event) {
-      const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+      let transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
       console.log("Gesagt:", transcript);
 
+      // Prüfe, ob eine der Farben im gesprochenen Text vorkommt
       Object.keys(colorWords).forEach(colorName => {
         if (transcript.includes(colorName)) {
-          const number = colorWords[colorName];
-          selectedNumber = number;
-          selectedColor = palette[number];
+          let number = colorWords[colorName];
+          selectedNumber = number;           // Farbnummer speichern
+          selectedColor = palette[number];  // Farbe aus Palette holen
+          // Anzeige aktualisieren (Farbe + Hinweis, dass Sprache genutzt wurde)
           colorLabel.setAttribute("value", `Farbe: ${colorName.charAt(0).toUpperCase() + colorName.slice(1)} (per Sprache)`);
           console.log("Farbe gesetzt:", selectedColor);
         }
       });
     };
 
+    // Fehlerbehandlung der Spracherkennung
     recognition.onerror = function (event) {
       console.error("Speech error", event.error);
     };
 
+    // Wenn Spracherkennung stoppt, direkt neu starten (für Dauerbetrieb)
     recognition.onend = function () {
       console.log("Spracherkennung gestoppt. Starte neu...");
       recognition.start();
     };
 
-    recognition.start();
+    recognition.start();  // Spracherkennung starten
   }
 
-  // Funktion: Blöcke und Events initialisieren
+  // Funktion: Blöcke des Motivs erzeugen und Events setzen
   function initBlocks() {
-    const keys = Object.keys(motifs);
-    const chosenKey = keys[Math.floor(Math.random() * keys.length)];
-    const chosenMotif = motifs[chosenKey];
-    const blockSize = 0.3;
+    let keys = Object.keys(motifs);   // Alle Motivnamen holen
+    let chosenKey = keys[Math.floor(Math.random() * keys.length)];  // Zufälliges Motiv auswählen
+    let chosenMotif = motifs[chosenKey];  // Das Motiv (2D Array)
+    let blockSize = 0.3;               // Größe der Blöcke
 
-    const blockContainer = document.createElement("a-entity");
+    let blockContainer = document.createElement("a-entity");  // Container für Blöcke
     blockContainer.setAttribute("id", "blockContainer");
-    blockContainer.setAttribute("position", "0.1 1.6 -3");
+    blockContainer.setAttribute("position", "0.1 1.6 -3");    // Position in der Szene
 
+    // Für jede Zeile und Spalte im Motiv
     chosenMotif.forEach((row, y) => {
       row.forEach((num, x) => {
-        if (num === 0) return;
+        if (num === 0) return;         // 0 = kein Block, überspringen
 
-        const el = document.createElement("a-plane");
+        let el = document.createElement("a-plane");   // Block als Plane
         el.setAttribute("class", "paintBlock");
 
-        const posX = (x - row.length / 2) * blockSize;
-        const posY = -(y * blockSize);
+        // Position berechnen, so dass Blöcke zentriert sind
+        let posX = (x - row.length / 2) * blockSize;
+        let posY = -(y * blockSize);
         el.setAttribute("position", `${posX} ${posY} 0`);
         el.setAttribute("width", blockSize);
         el.setAttribute("height", blockSize);
-        el.setAttribute("color", "#ffffff");
-        el.setAttribute("data-number", num);
-        el.setAttribute("material", "shader: flat");
+        el.setAttribute("color", "#ffffff");          // Anfangs weiß
+        el.setAttribute("data-number", num);          // Nummer für Vergleich speichern
+        el.setAttribute("material", "shader: flat"); // Flaches Material (kein Licht)
 
-        const text = document.createElement("a-text");
+        // Nummer als Text auf dem Block anzeigen
+        let text = document.createElement("a-text");
         text.setAttribute("value", num);
         text.setAttribute("align", "center");
         text.setAttribute("color", "black");
-        text.setAttribute("position", "0 0 0.01");
+        text.setAttribute("position", "0 0 0.01");   // Leicht vor dem Block
         text.setAttribute("width", 2);
         el.appendChild(text);
 
-        blockContainer.appendChild(el);
+        blockContainer.appendChild(el);               // Block zum Container hinzufügen
       });
     });
 
-    document.querySelector("a-scene").appendChild(blockContainer);
+    document.querySelector("a-scene").appendChild(blockContainer); // Container zur Szene
 
-    // Farbwahl (per Klick auf Palette)
+    // Eventlistener für Farbpalette (Farbe auswählen per Klick)
     document.querySelectorAll(".colorChoice").forEach(el => {
       el.addEventListener("click", () => {
-        selectedColor = el.getAttribute("data-color");
-        selectedNumber = el.getAttribute("data-number");
-        const colorName = el.getAttribute("data-name") || selectedColor;
-        colorLabel.setAttribute("value", `Farbe: ${colorName}`);
+        selectedColor = el.getAttribute("data-color");     // Ausgewählte Farbe speichern
+        selectedNumber = el.getAttribute("data-number");   // Passende Nummer speichern
+        let colorName = el.getAttribute("data-name") || selectedColor;
+        colorLabel.setAttribute("value", `Farbe: ${colorName}`);  // Anzeige aktualisieren
       });
     });
 
-    // Anmalen durch Blick + Klick
+    // Eventlistener: Malen, wenn ein Block angeklickt wird
     document.addEventListener("click", e => {
-      if (!e.target.classList.contains("paintBlock")) return;
-      if (!selectedColor || !selectedNumber) return;
+      if (!e.target.classList.contains("paintBlock")) return;  // Nur reagieren, wenn Block
+      if (!selectedColor || !selectedNumber) return;            // Nur wenn Farbe ausgewählt
 
-      const blockNum = e.target.getAttribute("data-number");
-      if (blockNum === selectedNumber) {
-        e.target.setAttribute("color", selectedColor);
+      let blockNum = e.target.getAttribute("data-number");     // Nummer des Blocks abfragen
+      if (blockNum === selectedNumber) {                        // Nur passende Nummer färben
+        e.target.setAttribute("color", selectedColor);         // Block einfärben
+
+        // Mal-Ton abspielen, falls vorhanden
         if (paintSound.components.sound) {
           paintSound.components.sound.playSound();
         }
