@@ -1,4 +1,8 @@
-document.querySelector('a-scene').addEventListener('loaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
+  const startScreen = document.getElementById("startScreen");
+  const startButton = document.getElementById("startButton");
+  const scene = document.querySelector("a-scene");
+
   let selectedColor = null;
   let selectedNumber = null;
   const colorLabel = document.getElementById("selectedColorLabel");
@@ -12,9 +16,22 @@ document.querySelector('a-scene').addEventListener('loaded', () => {
     5: 'brown',
   };
 
-  // Sprachsteuerung aktivieren
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (SpeechRecognition) {
+  // Startbutton-Klick
+  startButton.addEventListener("click", () => {
+    startScreen.style.display = "none";      // Startbildschirm ausblenden
+    scene.style.display = "block";           // VR-Szene anzeigen
+    startSpeechRecognition();                // Spracherkennung starten
+    initBlocks();                            // Blöcke laden
+  });
+
+  // Funktion: Spracherkennung starten
+  function startSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn("Spracherkennung wird von diesem Browser nicht unterstützt.");
+      return;
+    }
+
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.lang = 'de-DE';
@@ -53,88 +70,82 @@ document.querySelector('a-scene').addEventListener('loaded', () => {
     };
 
     recognition.start();
-  } else {
-    console.warn("Spracherkennung wird von diesem Browser nicht unterstützt.");
   }
 
-  // Zufälliges Motiv auswählen
-  const keys = Object.keys(motifs);
-  const chosenKey = keys[Math.floor(Math.random() * keys.length)];
-  const chosenMotif = motifs[chosenKey];
+  // Funktion: Blöcke und Events initialisieren
+  function initBlocks() {
+    const keys = Object.keys(motifs);
+    const chosenKey = keys[Math.floor(Math.random() * keys.length)];
+    const chosenMotif = motifs[chosenKey];
+    const blockSize = 0.3;
 
-  // Blöcke rendern
-  const blockSize = 0.3;
+    const blockContainer = document.createElement("a-entity");
+    blockContainer.setAttribute("id", "blockContainer");
+    blockContainer.setAttribute("position", "0.1 1.6 -3");
 
-  // Container erstellen, der die Blöcke gemeinsam hält
-  const blockContainer = document.createElement("a-entity");
-  blockContainer.setAttribute("id", "blockContainer");
-  blockContainer.setAttribute("position", "0.1 1.6 -3"); // <-- hier waren Kommas/Zitate fehlend
+    chosenMotif.forEach((row, y) => {
+      row.forEach((num, x) => {
+        if (num === 0) return;
 
-  // Blöcke im Container erzeugen
-  chosenMotif.forEach((row, y) => {
-    row.forEach((num, x) => {
-      if (num === 0) return;
+        const el = document.createElement("a-plane");
+        el.setAttribute("class", "paintBlock");
 
-      const el = document.createElement("a-plane");
-      el.setAttribute("class", "paintBlock");
+        const posX = (x - row.length / 2) * blockSize;
+        const posY = -(y * blockSize);
+        el.setAttribute("position", `${posX} ${posY} 0`);
+        el.setAttribute("width", blockSize);
+        el.setAttribute("height", blockSize);
+        el.setAttribute("color", "#ffffff");
+        el.setAttribute("data-number", num);
+        el.setAttribute("material", "shader: flat");
 
-      const posX = (x - row.length / 2) * blockSize;
-      const posY = -(y * blockSize);
-      el.setAttribute("position", `${posX} ${posY} 0`); // <-- Template-String ergänzt
-      el.setAttribute("width", blockSize);
-      el.setAttribute("height", blockSize);
-      el.setAttribute("color", "#ffffff");
-      el.setAttribute("data-number", num);
-      el.setAttribute("material", "shader: flat");
+        const text = document.createElement("a-text");
+        text.setAttribute("value", num);
+        text.setAttribute("align", "center");
+        text.setAttribute("color", "black");
+        text.setAttribute("position", "0 0 0.01");
+        text.setAttribute("width", 2);
+        el.appendChild(text);
 
-      const text = document.createElement("a-text");
-      text.setAttribute("value", num);
-      text.setAttribute("align", "center");
-      text.setAttribute("color", "black");
-      text.setAttribute("position", "0 0 0.01");
-      text.setAttribute("width", 2);
-      el.appendChild(text);
-
-      blockContainer.appendChild(el);
+        blockContainer.appendChild(el);
+      });
     });
-  });
 
-  // Container zur Szene hinzufügen
-  document.querySelector("a-scene").appendChild(blockContainer);
+    document.querySelector("a-scene").appendChild(blockContainer);
 
-  // Farbwahl
-  document.querySelectorAll(".colorChoice").forEach(el => {
-    el.addEventListener("click", () => {
-      selectedColor = el.getAttribute("data-color");
-      selectedNumber = el.getAttribute("data-number");
-      const colorName = el.getAttribute("data-name") || selectedColor;
-      colorLabel.setAttribute("value", `Farbe: ${colorName}`); // <-- Template-String ergänzt
+    // Farbwahl (per Klick auf Palette)
+    document.querySelectorAll(".colorChoice").forEach(el => {
+      el.addEventListener("click", () => {
+        selectedColor = el.getAttribute("data-color");
+        selectedNumber = el.getAttribute("data-number");
+        const colorName = el.getAttribute("data-name") || selectedColor;
+        colorLabel.setAttribute("value", `Farbe: ${colorName}`);
+      });
     });
-  });
 
-  // Anmalen durch Blick
-  document.addEventListener("click", e => {
-    if (!e.target.classList.contains("paintBlock")) return;
-    if (!selectedColor || !selectedNumber) return;
+    // Anmalen durch Blick + Klick
+    document.addEventListener("click", e => {
+      if (!e.target.classList.contains("paintBlock")) return;
+      if (!selectedColor || !selectedNumber) return;
 
-    const blockNum = e.target.getAttribute("data-number");
-    if (blockNum === selectedNumber) {
-      e.target.setAttribute("color", selectedColor);
-      if (paintSound.components.sound) {
-        paintSound.components.sound.playSound();
+      const blockNum = e.target.getAttribute("data-number");
+      if (blockNum === selectedNumber) {
+        e.target.setAttribute("color", selectedColor);
+        if (paintSound.components.sound) {
+          paintSound.components.sound.playSound();
+        }
       }
-    }
-  });
-
-  document.getElementById("resetButton").addEventListener("click", () => {
-    // Alle Blöcke auf Weiß zurücksetzen
-    document.querySelectorAll(".paintBlock").forEach(block => {
-      block.setAttribute("color", "#ffffff");
     });
 
-    // Farbe zurücksetzen
-    selectedColor = null;
-    selectedNumber = null;
-    colorLabel.setAttribute("value", "Farbe: -");
-  });
+    // Reset-Button
+    document.getElementById("resetButton").addEventListener("click", () => {
+      document.querySelectorAll(".paintBlock").forEach(block => {
+        block.setAttribute("color", "#ffffff");
+      });
+
+      selectedColor = null;
+      selectedNumber = null;
+      colorLabel.setAttribute("value", "Farbe: -");
+    });
+  }
 });
