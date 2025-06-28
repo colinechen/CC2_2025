@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
         el.setAttribute("height", blockSize);
         el.setAttribute("color", "#ffffff");
         el.setAttribute("data-number", num);
-        el.setAttribute("material");
         el.setAttribute("rotation", "0 180 0");
 
         let text = document.createElement("a-text");
