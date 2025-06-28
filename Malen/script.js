@@ -8,8 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedColor = null;
   let selectedNumber = null;
 
-  let hoveredColorEl = null; // Aktuell angesehene Farbe
-
   let palette = {
     1: '#ffd1dc',
     2: '#a8dadc',
@@ -18,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     5: 'brown',
     6: 'black'
   };
+
+  let currentLookedAtColorEl = null; // Farbpalette-Element, das gerade angeschaut wird
 
   function initBlocks() {
     let keys = Object.keys(motifs);
@@ -52,49 +52,58 @@ document.addEventListener('DOMContentLoaded', () => {
         text.setAttribute("width", 2);
         el.appendChild(text);
 
+        // Blöcke werden durch Fuse (Gaze + Timeout) automatisch per click angemalt
+        el.addEventListener("click", () => {
+          if (!selectedColor || !selectedNumber) return;
+
+          let blockNum = el.getAttribute("data-number");
+          if (blockNum === selectedNumber) {
+            el.setAttribute("color", selectedColor);
+            if (paintSound.components.sound) {
+              paintSound.components.sound.playSound();
+            }
+          }
+        });
+
         blockContainer.appendChild(el);
       });
     });
 
     scene.appendChild(blockContainer);
 
-    // Gaze-Ziel erfassen
+    // Farbpalette - nur merken welches Element angeschaut wird (kein Farbwechsel hier)
     document.querySelectorAll(".colorChoice").forEach(el => {
       el.addEventListener("mouseenter", () => {
-        hoveredColorEl = el;
+        currentLookedAtColorEl = el;
+        el.setAttribute("scale", "1.2 1.2 1"); // Optional: Hervorhebung
       });
       el.addEventListener("mouseleave", () => {
-        hoveredColorEl = null;
+        if (currentLookedAtColorEl === el) {
+          currentLookedAtColorEl = null;
+        }
+        el.setAttribute("scale", "1 1 1");
       });
     });
+  }
 
-    // Touchstart auf die Szene: Farbe wählen, wenn Blick auf Farbfeld
-    ["touchstart", "click"].forEach(evtName => {
-  scene.addEventListener(evtName, () => {
-    if (hoveredColorEl) {
-      selectedColor = hoveredColorEl.getAttribute("data-color");
-      selectedNumber = hoveredColorEl.getAttribute("data-number");
-      let colorName = hoveredColorEl.getAttribute("data-name") || selectedColor;
+  // Klick auf Szene = Farbwahl nur, wenn Farbpalette angeschaut wird
+  scene.addEventListener("click", (evt) => {
+    const cursor = evt.detail.cursorEl;
+    if (!cursor) return;
+
+    // Nur echten Controller-Klick zulassen, nicht Fuse-automatisch
+    if (cursor.components.cursor && cursor.components.cursor.fusing) {
+      // Automatischer Fuse-Click, ignorieren
+      return;
+    }
+
+    if (currentLookedAtColorEl) {
+      selectedColor = currentLookedAtColorEl.getAttribute("data-color");
+      selectedNumber = currentLookedAtColorEl.getAttribute("data-number");
+      let colorName = currentLookedAtColorEl.getAttribute("data-name") || selectedColor;
       colorLabel.setAttribute("value", `Farbe: ${colorName}`);
     }
   });
-});
-
-
-    // Blöcke bemalen
-    document.addEventListener("click", e => {
-      if (!e.target.classList.contains("paintBlock")) return;
-      if (!selectedColor || !selectedNumber) return;
-
-      let blockNum = e.target.getAttribute("data-number");
-      if (blockNum === selectedNumber) {
-        e.target.setAttribute("color", selectedColor);
-        if (paintSound.components.sound) {
-          paintSound.components.sound.playSound();
-        }
-      }
-    });
-  }
 
   function loadNewMotif() {
     let oldContainer = document.getElementById("blockContainer");
