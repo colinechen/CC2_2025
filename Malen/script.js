@@ -17,8 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     6: 'black'
   };
 
-  let currentLookedAtColorEl = null; // Farbpalette-Element, das gerade angeschaut wird
-
   function initBlocks() {
     let keys = Object.keys(motifs);
     let chosenKey = keys[Math.floor(Math.random() * keys.length)];
@@ -52,10 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
         text.setAttribute("width", 2);
         el.appendChild(text);
 
-        // Blöcke werden durch Fuse (Gaze + Timeout) automatisch per click angemalt
+        // Gaze (Fuse) aktiviert Blockbemalung – das ist erlaubt
         el.addEventListener("click", () => {
           if (!selectedColor || !selectedNumber) return;
-
           let blockNum = el.getAttribute("data-number");
           if (blockNum === selectedNumber) {
             el.setAttribute("color", selectedColor);
@@ -70,40 +67,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     scene.appendChild(blockContainer);
-
-    // Farbpalette - nur merken welches Element angeschaut wird (kein Farbwechsel hier)
-    document.querySelectorAll(".colorChoice").forEach(el => {
-      el.addEventListener("mouseenter", () => {
-        currentLookedAtColorEl = el;
-        el.setAttribute("scale", "1.2 1.2 1"); // Optional: Hervorhebung
-      });
-      el.addEventListener("mouseleave", () => {
-        if (currentLookedAtColorEl === el) {
-          currentLookedAtColorEl = null;
-        }
-        el.setAttribute("scale", "1 1 1");
-      });
-    });
   }
 
-  // Klick auf Szene = Farbwahl nur, wenn Farbpalette angeschaut wird
- // Cursor direkt abfragen
-const cursor = document.querySelector('a-cursor');
-if (cursor) {
-  cursor.addEventListener("click", (evt) => {
-    // Nur Farbwahl erlauben, wenn etwas aus der Palette angeschaut wurde
-    if (!currentLookedAtColorEl) return;
+  // NUR Touch (echter Klick) auf Farbflächen wählt Farbe
+  document.querySelectorAll(".colorChoice").forEach(el => {
+    el.setAttribute("cursor-listener", ""); // Für Custom-Komponente, optional
+    el.setAttribute("class", "colorChoice clickable");
 
-    // Nur echten Klick zulassen (nicht Fuse)
-    if (evt.detail && evt.detail.intersection && !cursor.components.cursor.fusing) {
-      selectedColor = currentLookedAtColorEl.getAttribute("data-color");
-      selectedNumber = currentLookedAtColorEl.getAttribute("data-number");
-      let colorName = currentLookedAtColorEl.getAttribute("data-name") || selectedColor;
+    el.addEventListener("click", (evt) => {
+      // Check, ob es ein echter Klick ist, kein Gaze-Fuse
+      const cursorEl = evt.detail?.cursorEl;
+      const isFuse = cursorEl?.components?.cursor?.fusing;
+      if (isFuse) return; // Gaze: ignorieren
+
+      selectedColor = el.getAttribute("data-color");
+      selectedNumber = el.getAttribute("data-number");
+      const colorName = el.getAttribute("data-name") || selectedColor;
       colorLabel.setAttribute("value", `Farbe: ${colorName}`);
-    }
+    });
   });
-}
-
 
   function loadNewMotif() {
     let oldContainer = document.getElementById("blockContainer");
