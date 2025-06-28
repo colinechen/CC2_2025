@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         text.setAttribute("width", 2);
         el.appendChild(text);
 
-        // Gaze (Fuse) aktiviert Blockbemalung – das ist erlaubt
+        // Gaze (Fuse) aktiviert Blockbemalung – erlaubt
         el.addEventListener("click", () => {
           if (!selectedColor || !selectedNumber) return;
           let blockNum = el.getAttribute("data-number");
@@ -69,17 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
     scene.appendChild(blockContainer);
   }
 
-  // NUR Touch (echter Klick) auf Farbflächen wählt Farbe
+  // Farbpalette: Nur echte Klicks (Touch/Button-Click), kein Fuse!
   document.querySelectorAll(".colorChoice").forEach(el => {
-    el.setAttribute("cursor-listener", ""); // Für Custom-Komponente, optional
-    el.setAttribute("class", "colorChoice clickable");
-
-    el.addEventListener("click", (evt) => {
-      // Check, ob es ein echter Klick ist, kein Gaze-Fuse
-      const cursorEl = evt.detail?.cursorEl;
-      const isFuse = cursorEl?.components?.cursor?.fusing;
-      if (isFuse) return; // Gaze: ignorieren
-
+    el.addEventListener("click", () => {
       selectedColor = el.getAttribute("data-color");
       selectedNumber = el.getAttribute("data-number");
       const colorName = el.getAttribute("data-name") || selectedColor;
@@ -101,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initBlocks();
   });
 
+  // Eventlistener für den Button "Neues Motiv"
   let newMotifButton = document.getElementById("newMotifButton");
   if (newMotifButton) {
     newMotifButton.addEventListener("click", () => {
