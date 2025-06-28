@@ -18,7 +18,7 @@
     </a-assets>
 
     <!-- Raum (gespiegelt in Z) -->
-    <a-plane position="0.5 -6 3" rotation="-90 0 0" width="60" height="80" src="#floorTexture" repeat="1 1" shadow></a-plane>
+    <a-plane position="0.5 -1 3" rotation="-90 0 0" scale="0.6 0.6 1" width="40" height="40" src="#floorTexture" repeat="1 1" shadow></a-plane>
     <a-box position="0 2 8" depth="0.1" height="4" width="12" color="#EDE8D0"></a-box>
     <a-box position="-6 2 3" depth="12" height="4" width="0.1" color="#EDE8D0"></a-box>
     <a-box position="6 2 3" depth="12" height="4" width="0.1" color="#EDE8D0"></a-box>
@@ -29,7 +29,11 @@
     <a-text
       id="instructionsText"
       font="https://cdn.aframe.io/fonts/mozillavr.fnt" 
-      value="Willkommen!\nDrehe dich um, um mit dem Malen zu beginnen.\nMale die Bloecke in der richtigen Farbe aus. Die passenden Farben erkennst du an den Zahlen auf den Bloecken.\nKlicke zuerst eine Farbe aus der Farbpalette an und male dann die Bloecke an, um das Bild zu gestalten.\nWenn du fertig bist und ein neues Motiv malen willst, klicke einfach auf den Button „Neues Motiv“."
+      value= "Willkommen!\nDrehe dich um, um das Malen zu starten.\n
+              Male die Bloecke in der richtigen Farbe aus. Die Zahlen auf den Bloecken zeigen dir, welche Farbe wohin gehoert.\n
+              Wähle zuerst eine Farbe aus der Farbpalette aus und beginne dann, die Bloecke anzumalen, um das Bild zum Leben zu erwecken.\n
+              Wenn du fertig bist und ein neues Motiv gestalten willst, klicke einfach auf den Button „Neues Motiv“."
+
       width="5"
       position="0 2 -2.95"
       rotation="0 0 0"
@@ -44,11 +48,10 @@
     <a-entity gltf-model="Models/Lamp.glb" position="-2.5 0 -1.2" scale="0.9 0.9 0.9" rotation="0 130 0"></a-entity>
     <a-entity gltf-model="Models/Art Easel Set Up.glb" position="4 0 -1.7" scale="-0.2 0.2 0.2" rotation="0 -135 0"></a-entity>
 
-    <a-entity gltf-model="Models/Square window.glb" position="2 2 7" scale="1 1 1" rotation="0 90 0"></a-entity>
-    <a-entity gltf-model="Models/Square window.glb" position="-2 2 7" scale="1 1 1" rotation="0 90 0"></a-entity>
+    <a-entity gltf-model="Models/Square window.glb" position="4 2 7.5" scale="1 1 1" rotation="0 90 0"></a-entity>
+    <a-entity gltf-model="Models/Square window.glb" position="-4 2 7.5" scale="1 1 1" rotation="0 90 0"></a-entity>
 
     <a-entity gltf-model="Models/Sofa.glb" position="4.5 0 2.3" scale="0.13 0.13 0.13" rotation="0 -180 0"></a-entity>
-    <a-entity gltf-model="Models/Door mat.glb" position="-2 -1.8 5" scale="0.2 0.2 0.2" rotation="0 -180 0"></a-entity>
 
     <a-entity gltf-model="Models/Paint Can.glb" position="-1.2 0 1.5" scale="0.6 0.6 0.6" rotation="0 -180 0"></a-entity>
     <a-entity gltf-model="Models/Paint Can.glb" position="-1.8 0 2.1" scale="0.8 0.8 0.8" rotation="0 -110 0"></a-entity>
@@ -101,7 +104,7 @@
 
 
     <!-- Farbpalette (gespiegelt) -->
-    <a-entity id="palette" position="0 2.5 2" rotation="0 180 0">
+    <a-entity id="palette" position="0 2.8 2" rotation="0 180 0">
       <a-plane class="colorChoice" color="#ffd1dc" data-color="#ffd1dc" data-number="1" data-name="Rosa" position="-1 0 0" width="0.3" height="0.3"></a-plane>
       <a-text value="1" position="-1 0 0" color="#000" align="center" width="2"></a-text>
       <a-text value="ROSA" position="-1 0.2 0" color="#000" align="center" width="2"></a-text>
@@ -128,7 +131,7 @@
     </a-entity>
 
     <!-- Button für neues Motiv (gespiegelt) -->
-    <a-plane id="newMotifButton" position="2 2.5 2" rotation="0 180 0" width="1" height="0.3" color="#8ecae6" class="clickable">
+    <a-plane id="newMotifButton" position="2 2.8 2" rotation="0 180 0" width="1" height="0.3" color="#8ecae6" class="clickable">
       <a-text value="Neues Motiv" align="center" color="black" position="0 0 0.01" width="3"></a-text>
     </a-plane>
 
@@ -136,7 +139,7 @@
     <a-entity id="paintSound" sound="src: #clickSound; on: playSound"></a-entity>
 
     <!-- Farbstatus (gespiegelt) -->
-    <a-text id="selectedColorLabel" value="Farbe: -" position="0 2.2 2" rotation="0 180 0" align="center" color="black"></a-text>
+    <a-text id="selectedColorLabel" value="Farbe: -" position="0 2.5 2" rotation="0 180 0" align="center" color="black"></a-text>
   </a-scene>
 </body>
 </html>
