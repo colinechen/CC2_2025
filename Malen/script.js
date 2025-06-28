@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     6: 'black'
   };
 
+
   function initBlocks() {
     let keys = Object.keys(motifs);
     let chosenKey = keys[Math.floor(Math.random() * keys.length)];
@@ -23,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let blockContainer = document.createElement("a-entity");
     blockContainer.setAttribute("id", "blockContainer");
-    blockContainer.setAttribute("position", "0.1 1.6 3");
+    blockContainer.setAttribute("position", "0 1.9 3");
     blockContainer.setAttribute("rotation", "0 180 0");
 
     chosenMotif.forEach((row, y) => {
@@ -77,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
       colorLabel.setAttribute("value", `Farbe: ${colorName}`);
     });
   });
+
 
   function loadNewMotif() {
     let oldContainer = document.getElementById("blockContainer");
