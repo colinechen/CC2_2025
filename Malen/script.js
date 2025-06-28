@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let startScreen = document.getElementById("startScreen");
-  let startButton = document.getElementById("startButton");
   let scene = document.querySelector("a-scene");
   let colorLabel = document.getElementById("selectedColorLabel");
   let paintSound = document.getElementById("paintSound");
@@ -25,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let blockContainer = document.createElement("a-entity");
     blockContainer.setAttribute("id", "blockContainer");
-    blockContainer.setAttribute("position", "0.1 1.6 -3");
+    blockContainer.setAttribute("position", "0.1 1.6 3");
 
     chosenMotif.forEach((row, y) => {
       row.forEach((num, x) => {
@@ -41,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.setAttribute("color", "#ffffff");
         el.setAttribute("data-number", num);
         el.setAttribute("material", "shader: flat");
+        el.setAttribute("rotation", "0 180 0");
 
         let text = document.createElement("a-text");
         text.setAttribute("value", num);
@@ -87,11 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initBlocks();
   }
 
-  startButton.addEventListener("click", () => {
-    startScreen.style.display = "none";
-    scene.style.display = "block";
-    initBlocks();
-  });
+  // Szene und Blöcke direkt initialisieren, kein Startscreen mehr
+  scene.style.display = "block";
+  initBlocks();
 
   // Eventlistener für den Button "Neues Motiv"
   let newMotifButton = document.getElementById("newMotifButton");
