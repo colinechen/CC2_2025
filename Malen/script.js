@@ -87,23 +87,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Klick auf Szene = Farbwahl nur, wenn Farbpalette angeschaut wird
-  scene.addEventListener("click", (evt) => {
-    const cursor = evt.detail.cursorEl;
-    if (!cursor) return;
+ // Cursor direkt abfragen
+const cursor = document.querySelector('a-cursor');
+if (cursor) {
+  cursor.addEventListener("click", (evt) => {
+    // Nur Farbwahl erlauben, wenn etwas aus der Palette angeschaut wurde
+    if (!currentLookedAtColorEl) return;
 
-    // Nur echten Controller-Klick zulassen, nicht Fuse-automatisch
-    if (cursor.components.cursor && cursor.components.cursor.fusing) {
-      // Automatischer Fuse-Click, ignorieren
-      return;
-    }
-
-    if (currentLookedAtColorEl) {
+    // Nur echten Klick zulassen (nicht Fuse)
+    if (evt.detail && evt.detail.intersection && !cursor.components.cursor.fusing) {
       selectedColor = currentLookedAtColorEl.getAttribute("data-color");
       selectedNumber = currentLookedAtColorEl.getAttribute("data-number");
       let colorName = currentLookedAtColorEl.getAttribute("data-name") || selectedColor;
       colorLabel.setAttribute("value", `Farbe: ${colorName}`);
     }
   });
+}
+
 
   function loadNewMotif() {
     let oldContainer = document.getElementById("blockContainer");
