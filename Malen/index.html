@@ -10,31 +10,47 @@
     <script defer src="script.js"></script>
 
     <style>
-     
+      #startScreen {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #fafafa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        flex-direction: column;
+      }
+
+      #startButton {
+        padding: 1em 2em;
+        font-size: 1.5em;
+        border: none;
+        border-radius: 10px;
+        background-color: #a8dadc;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+
+      #startButton:hover {
+        background-color: #7fc1c3;
+      }
+
+      a-scene {
+        display: none;
+      }
     </style>
   </head>
 
   <body>
-   
-   <a-scene embedded arjs="sourceType: webcam;">
-  <!-- Startbildschirm Container -->
-  <a-entity id="startScreen" position="0 1.6 -2" visible="true" class="start-screen">
-    <a-plane id="startPanel" class="start-panel" geometry="primitive: plane; width: 2.5; height: 1"
-             material="color: #fafafa; opacity: 0.95">
-    </a-plane>
-
-    <a-text id="startText" class="start-text" value="Malen nach Farben" align="center" color="black"
-            position="0 0.3 0.01" width="2.4">
-    </a-text>
-
-    <a-plane id="startButton" class="start-button clickable" geometry="primitive: plane; width: 1; height: 0.4"
-             material="color: #a8dadc; opacity: 0.9" position="0 -0.3 0.01">
-      <a-text value="Start" align="center" color="black" position="0 0 0.01" width="1.8"></a-text>
-    </a-plane>
-  </a-entity>
-
+    <!-- Startbildschirm -->
+    <div id="startScreen">
+      <h1>Malen nach Farben</h1>
+      <button id="startButton">Start</button>
+    </div>
 
     <!-- VR-Szene -->
+    <a-scene>
       <a-assets>
         <img id="floorTexture" src="Texture/wood-2045379_1280.jpg" crossorigin="anonymous" />
         <audio id="clickSound" src="Malen/sharp-pop-328170.mp3"></audio>
