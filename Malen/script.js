@@ -69,14 +69,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Touchstart auf die Szene: Farbe wählen, wenn Blick auf Farbfeld
-    scene.addEventListener("touchstart", () => {
-      if (hoveredColorEl) {
-        selectedColor = hoveredColorEl.getAttribute("data-color");
-        selectedNumber = hoveredColorEl.getAttribute("data-number");
-        let colorName = hoveredColorEl.getAttribute("data-name") || selectedColor;
-        colorLabel.setAttribute("value", `Farbe: ${colorName}`);
-      }
-    });
+    ["touchstart", "click"].forEach(evtName => {
+  scene.addEventListener(evtName, () => {
+    if (hoveredColorEl) {
+      selectedColor = hoveredColorEl.getAttribute("data-color");
+      selectedNumber = hoveredColorEl.getAttribute("data-number");
+      let colorName = hoveredColorEl.getAttribute("data-name") || selectedColor;
+      colorLabel.setAttribute("value", `Farbe: ${colorName}`);
+    }
+  });
+});
+
 
     // Blöcke bemalen
     document.addEventListener("click", e => {
