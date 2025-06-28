@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let blockContainer = document.createElement("a-entity");
     blockContainer.setAttribute("id", "blockContainer");
     blockContainer.setAttribute("position", "0.1 1.6 3");
+    blockContainer.setAttribute("rotation", "0 180 0");
 
     chosenMotif.forEach((row, y) => {
       row.forEach((num, x) => {
@@ -38,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.setAttribute("height", blockSize);
         el.setAttribute("color", "#ffffff");
         el.setAttribute("data-number", num);
-        el.setAttribute("rotation", "0 180 0");
+        
 
         let text = document.createElement("a-text");
         text.setAttribute("value", num);
