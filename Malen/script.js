@@ -7,10 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedNumber = null;
 
   let palette = {
-    1: '#ffd1dc',
-    2: '#a8dadc',
-    3: '#c1e1c1',
-    4: '#fff3b0',
+    1: '#ffd1dc', //rosa
+    2: '#a8dadc', //blau
+    3: '#c1e1c1', //grün
+    4: '#fff3b0', //gelb
     5: 'brown',
     6: 'black'
   };
@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let el = document.createElement("a-plane"); //Erstellt einzelnen Block und gibt Klasse paintBlock
         el.setAttribute("class", "paintBlock");
-        let posX = (x - row.length / 2) * blockSize; //berechnet Position des Blocks
-        let posY = -(y * blockSize);
+        let posX = (x - row.length / 2) * blockSize; //berechnet mittige Position des Blocks
+        let posY = -(y * blockSize); //untereinander
         //Setzt Position, Größe, Farbe und speichert die Farbnummer
         el.setAttribute("position", `${posX} ${posY} 0`);
         el.setAttribute("width", blockSize);
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
           let blockNum = el.getAttribute("data-number");
           if (blockNum === selectedNumber) {
             el.setAttribute("color", selectedColor); //ändert Farbe des Blocks
-            //spielt Sound
+            //spielt Sound wenn Farbe und Zahl übereinstimmen
             if (paintSound.components.sound) {
               paintSound.components.sound.playSound();
             }
@@ -79,14 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
     scene.appendChild(blockContainer);
   }
 
-  //Farbauswahl Klick element
+  // zeigt Farbauswahl über Blöxken (Klick element)
   document.querySelectorAll(".colorChoice").forEach(el => {
     el.addEventListener("click", () => {
       //speichert Farbe und Nummer
       selectedColor = el.getAttribute("data-color");
       selectedNumber = el.getAttribute("data-number");
-      //zeigt Namen der Farbe an
-      const colorName = el.getAttribute("data-name") || selectedColor;
+      //zeigt Namen der Farbe an (über Blöcken)
+      let colorName = el.getAttribute("data-name") || selectedColor;
       colorLabel.setAttribute("value", `Farbe: ${colorName}`);
     });
   });
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (oldContainer) {
       oldContainer.parentNode.removeChild(oldContainer);
     }
-    initBlocks();
+    initBlocks(); //neues Motiv laden
   }
 
   // Szene wird sichtbar, falls vorher unsichtbar
