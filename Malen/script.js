@@ -35,10 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (num === 0) return; //wenn Block 0, bleibt leer
 
 
+        //Erstellung Farbblöcke
         let el = document.createElement("a-plane"); //Erstellt einzelnen Block und gibt Klasse paintBlock
         el.setAttribute("class", "paintBlock");
         let posX = (x - row.length / 2) * blockSize; //berechnet mittige Position des Blocks
-        let posY = -(y * blockSize); //untereinander
+        let posY = -(y * blockSize); // vertikal untereinander
         //Setzt Position, Größe, Farbe und speichert die Farbnummer
         el.setAttribute("position", `${posX} ${posY} 0`);
         el.setAttribute("width", blockSize);
@@ -47,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.setAttribute("data-number", num);
         
 
-        // Zahl als Text über Block
+        // Zahl als Text in Block
         let text = document.createElement("a-text");
         text.setAttribute("value", num);
         text.setAttribute("align", "center");
